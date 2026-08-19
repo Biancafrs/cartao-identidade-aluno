@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ aluno.nome }} · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="detalhe-pagina">
+    <a class="voltar" href="{% url 'alunos:lista' %}">← Voltar para todos os alunos</a>
+    <article class="identidade">
+        <div class="identidade-lateral">
+            <span class="avatar avatar-grande" aria-hidden="true">{{ aluno.nome|first|upper }}</span>
+            <span class="status"><i></i> Perfil ativo</span>
+        </div>
+        <div class="identidade-conteudo">
+            <p class="etiqueta">IDENTIDADE · {{ aluno.pk|stringformat:'04d' }}</p>
+            <h1>{{ aluno.nome }}</h1>
+            <p class="curso">{{ aluno.curso }}</p>
+            <div class="divisor"></div>
+            <span class="bio-titulo">Sobre</span>
+            <p class="bio-completa">{{ aluno.bio }}</p>
+            <small>Integrante da comunidade acadêmica desde {{ aluno.criado_em|date:'Y' }}</small>
+        </div>
+    </article>
+</section>
+{% endblock %}
