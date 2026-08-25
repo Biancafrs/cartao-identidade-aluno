@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Excluir {{ aluno.nome }} · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="formulario-pagina">
+  <a class="voltar" href="{% url 'alunos:lista' %}">← Voltar para todos os alunos</a>
+  <div class="painel-formulario">
+    <p class="etiqueta">Confirmação</p>
+    <h1>Excluir aluno</h1>
+    <p>Tem certeza de que deseja excluir <strong>{{ aluno.nome }}</strong>?</p>
+    <p class="aviso">Esta ação não poderá ser desfeita.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="acoes-formulario">
+        <button class="botao botao-perigo" type="submit">Sim, excluir</button>
+        <a class="botao botao-secundario" href="{% url 'alunos:lista' %}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

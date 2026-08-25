@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }} · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="formulario-pagina">
+  <a class="voltar" href="{% url 'alunos:lista' %}">← Voltar para todos os alunos</a>
+  <div class="painel-formulario">
+    <p class="etiqueta">Cadastro acadêmico</p>
+    <h1>{{ titulo }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <div class="campo">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" name="nome" value="{{ aluno.nome|default:'' }}" maxlength="100" required>
+      </div>
+      <div class="campo">
+        <label for="curso">Curso</label>
+        <input id="curso" type="text" name="curso" value="{{ aluno.curso|default:'' }}" maxlength="100" required>
+      </div>
+      <div class="campo">
+        <label for="bio">Biografia</label>
+        <textarea id="bio" name="bio" rows="5" maxlength="280">{{ aluno.bio|default:'' }}</textarea>
+        <small>Até 280 caracteres.</small>
+      </div>
+      <div class="acoes-formulario">
+        <button class="botao botao-primario" type="submit">Salvar</button>
+        <a class="botao botao-secundario" href="{% url 'alunos:lista' %}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
