@@ -1,13 +1,15 @@
 :root {
-    --azul: #12355b;
-    --azul-claro: #e8f0f7;
-    --verde: #20a879;
-    --creme: #f7f4ed;
+    --azul: #1b3380;
+    --azul-escuro: #0d1f58;
+    --azul-claro: #e7efff;
+    --amarelo: #f8c21a;
+    --amarelo-claro: #fff4c6;
+    --cinza-fundo: #f5f7fb;
     --branco: #ffffff;
     --texto: #17212b;
     --texto-suave: #65717e;
     --borda: #dce2e7;
-    --sombra: 0 18px 45px rgb(18 53 91 / 10%);
+    --sombra: 0 18px 45px rgb(27 51 128 / 12%);
 }
 
 * {
@@ -22,7 +24,7 @@ body {
     min-height: 100vh;
     margin: 0;
     color: var(--texto);
-    background: var(--creme);
+    background: var(--cinza-fundo);
     font-family: "DM Sans", sans-serif;
 }
 
@@ -48,16 +50,10 @@ a {
     text-decoration: none;
 }
 
-.marca-icone {
-    display: grid;
-    width: 48px;
-    height: 48px;
-    place-items: center;
-    color: var(--branco);
-    background: var(--azul);
-    border-radius: 14px;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 700;
+.marca-logo {
+    width: 58px;
+    height: 52px;
+    object-fit: contain;
 }
 
 .admin-link,
@@ -71,10 +67,14 @@ a {
 .admin-link:hover,
 .cartao > a:hover,
 .voltar:hover {
-    color: var(--verde);
+    color: var(--amarelo);
 }
 
 .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+    align-items: center;
+    gap: 34px;
     max-width: 1180px;
     margin: 52px auto 72px;
     padding: 0 24px;
@@ -83,7 +83,7 @@ a {
 .etiqueta,
 .secao-titulo span,
 .bio-titulo {
-    color: var(--verde);
+    color: var(--azul);
     font-size: .78rem;
     font-weight: 700;
     letter-spacing: .16em;
@@ -98,12 +98,13 @@ a {
     font-family: "Space Grotesk", sans-serif;
     font-size: clamp(2.7rem, 7vw, 5.8rem);
     line-height: .98;
-    letter-spacing: -.055em;
+    letter-spacing: 0;
 }
 
 .hero h1 em {
-    color: var(--verde);
+    color: var(--amarelo);
     font-style: normal;
+    text-shadow: 0 2px 0 var(--azul-escuro);
 }
 
 .introducao {
@@ -125,6 +126,67 @@ a {
     color: var(--azul);
     font-family: "Space Grotesk", sans-serif;
     font-size: 2rem;
+}
+
+.hero-capa {
+    position: relative;
+    overflow: hidden;
+    min-height: 360px;
+    padding: 34px;
+    color: var(--branco);
+    background:
+        linear-gradient(145deg, rgb(13 31 88 / 94%), rgb(27 51 128 / 84%)),
+        linear-gradient(35deg, var(--amarelo) 0 32%, transparent 32% 100%);
+    border: 1px solid rgb(27 51 128 / 14%);
+    border-radius: 24px;
+    box-shadow: var(--sombra);
+}
+
+.hero-capa::before {
+    position: absolute;
+    inset: auto -70px -90px auto;
+    width: 210px;
+    height: 210px;
+    content: "";
+    background: var(--amarelo);
+    border-radius: 50%;
+}
+
+.capa-logo {
+    display: grid;
+    position: relative;
+    width: min(220px, 82%);
+    min-height: 190px;
+    margin: 20px auto 36px;
+    place-items: center;
+    background: var(--branco);
+    border: 8px solid var(--amarelo);
+    border-radius: 22px;
+}
+
+.capa-logo img {
+    display: block;
+    width: min(150px, 78%);
+    height: auto;
+}
+
+.capa-info {
+    display: grid;
+    position: relative;
+    gap: 6px;
+}
+
+.capa-info span {
+    color: var(--amarelo-claro);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.capa-info strong {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.3rem);
 }
 
 .conteudo {
@@ -201,7 +263,7 @@ a {
 
 .curso {
     margin: 30px 0 8px;
-    color: var(--verde);
+    color: var(--azul);
     font-size: .8rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -225,17 +287,18 @@ a {
 
 .cartao > a {
     margin-top: auto;
+    color: var(--azul);
 }
 
 .vazio {
     padding: 70px 24px;
     text-align: center;
-    background: var(--creme);
+    background: var(--azul-claro);
     border-radius: 22px;
 }
 
 .vazio > span {
-    color: var(--verde);
+    color: var(--amarelo);
     font-size: 2.5rem;
 }
 
@@ -271,14 +334,14 @@ a {
     align-items: center;
     justify-content: space-between;
     flex-direction: column;
-    background: var(--azul);
+    background: linear-gradient(160deg, var(--azul-escuro), var(--azul));
 }
 
 .avatar-grande {
     width: 150px;
     height: 150px;
-    color: var(--azul);
-    background: var(--branco);
+    color: var(--azul-escuro);
+    background: var(--amarelo);
     font-size: 4rem;
 }
 
@@ -292,7 +355,7 @@ a {
     width: 8px;
     height: 8px;
     margin-right: 7px;
-    background: #44dda5;
+    background: var(--amarelo);
     border-radius: 50%;
 }
 
@@ -349,6 +412,17 @@ footer {
 
     .hero {
         margin-top: 32px;
+        grid-template-columns: 1fr;
+    }
+
+    .hero-capa {
+        min-height: 280px;
+        padding: 24px;
+    }
+
+    .capa-logo {
+        min-height: 150px;
+        margin-top: 6px;
     }
 
     .secao-titulo {

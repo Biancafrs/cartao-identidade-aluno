@@ -1,41 +1,67 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Alunos · Identidade Acadêmica{% endblock %}
+
 {% block content %}
 <section class="hero">
-    <p class="etiqueta">CAMPUS · PERFIS 2026</p>
-    <h1>Conheça quem está<br><em>construindo o futuro.</em></h1>
-    <p class="introducao">Um espaço para descobrir talentos, interesses e histórias que fazem parte da nossa comunidade acadêmica.</p>
-    <div class="resumo"><strong>{{ alunos|length|stringformat:'02d' }}</strong> estudante{{ alunos|length|pluralize }} em destaque</div>
+  <div class="hero-conteudo">
+    <p class="etiqueta">FEPI · ALUNOS 2026</p>
+    <h1>Conheça quem está<br /><em>construindo o futuro.</em></h1>
+    <p class="introducao">
+      Um espaço para descobrir talentos, interesses e histórias que fazem parte da
+      nossa comunidade acadêmica.
+    </p>
+    <div class="resumo">
+      <strong>{{ alunos|length|stringformat:'02d' }}</strong>
+      {% if alunos|length == 1 %}estudante em destaque{% else %}estudantes em destaque{% endif %}
+    </div>
+  </div>
+  <div class="hero-capa" aria-label="Capa FEPI">
+    <div class="capa-logo">
+      <img src="{% static 'alunos/img/logo-fepi.webp' %}" alt="FEPI Centro Universitário de Itajubá" />
+    </div>
+    <div class="capa-info">
+      <span>Centro Universitário de Itajubá</span>
+      <strong>Identidade acadêmica</strong>
+    </div>
+  </div>
 </section>
 
 <section class="conteudo" aria-labelledby="titulo-alunos">
-    <div class="secao-titulo">
-        <div><span>Diretório acadêmico</span><h2 id="titulo-alunos">Nossos alunos</h2></div>
-        <p>Explore os cartões para conhecer cada perfil.</p>
+  <div class="secao-titulo">
+    <div>
+      <span>Diretório acadêmico</span>
+      <h2 id="titulo-alunos">Nossos alunos</h2>
     </div>
-    {% if alunos %}
-    <div class="grade-cartoes">
-        {% for aluno in alunos %}
-        <article class="cartao">
-            <div class="cartao-topo">
-                <span class="avatar" aria-hidden="true">{{ aluno.nome|first|upper }}</span>
-                <span class="numero">ID · {{ aluno.pk|stringformat:'04d' }}</span>
-            </div>
-            <p class="curso">{{ aluno.curso }}</p>
-            <h3>{{ aluno.nome }}</h3>
-            <p class="bio">{{ aluno.bio }}</p>
-            <a href="{% url 'alunos:detalhe' aluno.pk %}">Ver identidade <span aria-hidden="true">→</span></a>
-        </article>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="vazio">
-        <span aria-hidden="true">✦</span>
-        <h3>Nenhum aluno cadastrado ainda</h3>
-        <p>Acesse a área administrativa para criar o primeiro cartão acadêmico.</p>
-        <a href="{% url 'admin:index' %}">Cadastrar aluno</a>
-    </div>
-    {% endif %}
+    <p>Explore os cartões para conhecer cada perfil.</p>
+  </div>
+  {% if alunos %}
+  <div class="grade-cartoes">
+    {% for aluno in alunos %}
+    <article class="cartao">
+      <div class="cartao-topo">
+        <span class="avatar" aria-hidden="true"
+          >{{ aluno.nome|first|upper }}</span
+        >
+        <span class="numero">ID · {{ aluno.pk|stringformat:'04d' }}</span>
+      </div>
+      <p class="curso">{{ aluno.curso }}</p>
+      <h3>{{ aluno.nome }}</h3>
+      <p class="bio">{{ aluno.bio }}</p>
+      <a href="{% url 'alunos:detalhe' aluno.pk %}"
+        >Ver identidade <span aria-hidden="true">→</span></a
+      >
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="vazio">
+    <span aria-hidden="true">✦</span>
+    <h3>Nenhum aluno cadastrado ainda</h3>
+    <p>Acesse a área administrativa para criar o primeiro cartão acadêmico.</p>
+    <a href="{% url 'admin:index' %}">Cadastrar aluno</a>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}
