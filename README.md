@@ -98,22 +98,14 @@ class Aluno(models.Model):
 5. Salve o registro.
 6. Acesse `/aluno/` para visualizar os cartoes.
 
-## Prints ou Demonstracao
+## Prints do projeto
 
-Adicione aqui os prints, GIF ou video curto demonstrando o funcionamento do projeto.
+<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/9989f783-c2ce-4028-a0a7-7ece3a4b8ccd" />
 
-Sugestao de evidencias:
+<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/84c7fc61-9707-4643-b4e7-b5f3b7f8cf53" />
 
-- Tela inicial com a lista de cartoes.
-- Tela de detalhes de um aluno.
-- Tela do Django Admin com alunos cadastrados.
+<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/9d9923bc-4aea-42da-8ab3-6e733cff455c" />
 
-Exemplo:
-
-```markdown
-![Lista de alunos](docs/prints/lista-alunos.png)
-![Detalhe do aluno](docs/prints/detalhe-aluno.png)
-```
 
 ## Observacao Sobre Uso de IA
 
