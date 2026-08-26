@@ -6,21 +6,18 @@
   <div class="painel-formulario">
     <p class="etiqueta">Cadastro acadêmico</p>
     <h1>{{ titulo }}</h1>
-    <form method="post">
+    <p class="aviso">A data e a hora da matrícula serão registradas automaticamente.</p>
+    <form method="post" novalidate>
       {% csrf_token %}
-      <div class="campo">
-        <label for="nome">Nome</label>
-        <input id="nome" type="text" name="nome" value="{{ aluno.nome|default:'' }}" maxlength="100" required>
-      </div>
-      <div class="campo">
-        <label for="curso">Curso</label>
-        <input id="curso" type="text" name="curso" value="{{ aluno.curso|default:'' }}" maxlength="100" required>
-      </div>
-      <div class="campo">
-        <label for="bio">Biografia</label>
-        <textarea id="bio" name="bio" rows="5" maxlength="280">{{ aluno.bio|default:'' }}</textarea>
-        <small>Até 280 caracteres.</small>
-      </div>
+      {% if form.non_field_errors %}<div class="erros-formulario">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="campo">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<span class="erro-campo">{{ error }}</span>{% endfor %}
+        </div>
+      {% endfor %}
       <div class="acoes-formulario">
         <button class="botao botao-primario" type="submit">Salvar</button>
         <a class="botao botao-secundario" href="{% url 'alunos:lista' %}">Cancelar</a>

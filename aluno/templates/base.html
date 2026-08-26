@@ -2,43 +2,14 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Cartões de identidade acadêmica dos alunos"
-    />
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Cartões de identidade acadêmica dos alunos">
     <title>{% block title %}Identidade Acadêmica{% endblock %}</title>
-    <link rel="icon" href="{% static 'alunos/img/favicon.ico' %}" />
-    <link rel="apple-touch-icon" href="{% static 'alunos/img/logo-fepi.webp' %}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{% static 'alunos/css/style.css' %}" />
+    <link rel="icon" href="{% static 'alunos/img/favicon.ico' %}"><link rel="apple-touch-icon" href="{% static 'alunos/img/logo-fepi.webp' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'alunos/css/style.css' %}">
   </head>
   <body>
-    <header class="cabecalho">
-      <a
-        class="marca"
-        href="{% url 'alunos:lista' %}"
-        aria-label="Página inicial"
-      >
-        <img
-          class="marca-logo"
-          src="{% static 'alunos/img/logo-fepi.webp' %}"
-          alt=""
-          aria-hidden="true"
-        />
-        <span>Identidade<br /><strong>Acadêmica FEPI</strong></span>
-      </a>
-      <a class="admin-link" href="{% url 'admin:index' %}"
-        >Área administrativa <span>↗</span></a
-      >
-    </header>
-    <main>{% block content %}{% endblock %}</main>
-    <footer>Projeto desenvolvido com Django por Bianca Ferreira.</footer>
+    <header class="cabecalho"><a class="marca" href="{% url 'alunos:lista' %}" aria-label="Página inicial"><img class="marca-logo" src="{% static 'alunos/img/logo-fepi.webp' %}" alt="" aria-hidden="true"><span>Identidade<br><strong>Acadêmica FEPI</strong></span></a><a class="admin-link" href="{% url 'admin:index' %}">Área administrativa <span>↗</span></a></header>
+    <main>{% block content %}{% endblock %}</main><footer>Projeto desenvolvido com Django por Bianca Ferreira.</footer>
   </body>
 </html>

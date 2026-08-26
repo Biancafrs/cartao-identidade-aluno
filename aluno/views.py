@@ -1,11 +1,30 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import AlunoForm
 from .models import Aluno
 
 
 def lista(request):
+    busca = request.GET.get('busca', '').strip()
+    curso = request.GET.get('curso', '').strip()
     alunos = Aluno.objects.all()
-    return render(request, 'lista.html', {'alunos': alunos})
+
+    if busca:
+        alunos = alunos.filter(Q(nome__icontains=busca) | Q(cpf__icontains=busca))
+    if curso:
+        alunos = alunos.filter(curso=curso)
+
+    cursos = (
+        Aluno.objects.order_by('curso')
+        .values_list('curso', flat=True)
+        .distinct()
+    )
+    return render(
+        request,
+        'lista.html',
+        {'alunos': alunos, 'busca': busca, 'curso_selecionado': curso, 'cursos': cursos},
+    )
 
 
 def detalhe(request, pk):
@@ -14,30 +33,25 @@ def detalhe(request, pk):
 
 
 def criar_aluno(request):
-    if request.method == 'POST':
-        nome = request.POST['nome']
-        curso = request.POST['curso']
-        bio = request.POST.get('bio', '')
-        Aluno.objects.create(nome=nome, curso=curso, bio=bio)
+    form = AlunoForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
         return redirect('alunos:lista')
 
-    return render(request, 'form_aluno.html', {'titulo': 'Novo Aluno'})
+    return render(request, 'form_aluno.html', {'form': form, 'titulo': 'Novo aluno'})
 
 
 def editar_aluno(request, pk):
     aluno = get_object_or_404(Aluno, pk=pk)
-
-    if request.method == 'POST':
-        aluno.nome = request.POST['nome']
-        aluno.curso = request.POST['curso']
-        aluno.bio = request.POST.get('bio', '')
-        aluno.save()
+    form = AlunoForm(request.POST or None, instance=aluno)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
         return redirect('alunos:lista')
 
     return render(
         request,
         'form_aluno.html',
-        {'aluno': aluno, 'titulo': f'Editar: {aluno.nome}'},
+        {'aluno': aluno, 'form': form, 'titulo': f'Editar: {aluno.nome}'},
     )
 
 

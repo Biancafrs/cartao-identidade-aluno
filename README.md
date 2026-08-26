@@ -5,10 +5,10 @@ Projeto desenvolvido com Django para exibir cartoes de identidade academica dos 
 ## Requisitos Atendidos
 
 - Uso do framework Django.
-- Modelo `Aluno` com os campos obrigatorios:
-  - `nome`: `CharField`
-  - `curso`: `CharField`
-  - `bio`: `TextField` com limite de 280 caracteres
+- Modelo `Aluno` com oito campos obrigatórios.
+- Data e hora da matrícula registradas automaticamente.
+- Validação de e-mail institucional `@fepi.edu.br`.
+- Busca por nome ou CPF e filtro por curso.
 - Front-end exibindo os cartoes dos alunos.
 - Pagina de listagem dos alunos.
 - Pagina de detalhes de cada aluno.
@@ -86,7 +86,11 @@ class Aluno(models.Model):
     nome = models.CharField(max_length=100)
     curso = models.CharField(max_length=100)
     bio = models.TextField(max_length=280)
-    criado_em = models.DateTimeField(default=timezone.now, editable=False)
+    matriculado_em = models.DateTimeField(auto_now_add=True)
+    email_institucional = models.EmailField()
+    cpf = models.CharField(max_length=14)
+    endereco = models.CharField(max_length=200)
+    data_nascimento = models.DateField()
 ```
 
 ## Como Cadastrar Alunos
@@ -94,7 +98,7 @@ class Aluno(models.Model):
 1. Acesse `http://127.0.0.1:8000/admin/`.
 2. Entre com o usuario administrador.
 3. Clique em `Alunos`.
-4. Cadastre `nome`, `curso` e `bio`.
+4. Preencha os campos obrigatórios do aluno.
 5. Salve o registro.
 6. Acesse `/aluno/` para visualizar os cartoes.
 
