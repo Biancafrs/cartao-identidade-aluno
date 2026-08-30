@@ -297,35 +297,39 @@ a {
 
 .acoes-icone a {
     display: inline-flex;
-    width: auto;
+    width: 34px;
     height: 34px;
-    padding: 0 10px;
     align-items: center;
     justify-content: center;
-    place-items: center;
-    color: #8a6500;
-    background: var(--amarelo-claro);
+    color: var(--texto-suave);
     border-radius: 9px;
-    font-size: .75rem;
-    font-weight: 700;
     text-decoration: none;
-    transition: color .2s ease, background .2s ease, transform .2s ease;
+    transition: color .2s ease, transform .2s ease;
 }
 
-.acoes-icone a:hover {
-    color: var(--azul-escuro);
-    background: var(--amarelo);
+.acoes-icone a:hover,
+.acoes-icone a:focus-visible {
     transform: translateY(-2px);
 }
 
-.acoes-icone a.acao-excluir {
-    color: #a52323;
-    background: #fdeaea;
+.acoes-icone a.acao-editar:hover,
+.acoes-icone a.acao-editar:focus-visible {
+    color: var(--azul);
 }
 
-.acoes-icone a.acao-excluir:hover {
-    color: var(--branco);
-    background: #a52323;
+.acoes-icone a.acao-editar:hover svg,
+.acoes-icone a.acao-editar:focus-visible svg {
+    stroke: var(--azul);
+}
+
+.acoes-icone a.acao-excluir:hover,
+.acoes-icone a.acao-excluir:focus-visible {
+    color: #c62828;
+}
+
+.acoes-icone a.acao-excluir:hover svg,
+.acoes-icone a.acao-excluir:focus-visible svg {
+    stroke: #c62828;
 }
 
 .acoes-icone svg {
@@ -336,6 +340,7 @@ a {
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
+    transition: stroke .2s ease;
 }
 
 .curso {

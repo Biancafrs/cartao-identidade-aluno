@@ -28,5 +28,8 @@ class AlunoForm(forms.ModelForm):
         }
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 5}),
-            'data_nascimento': forms.DateInput(attrs={'type': 'date'}),
+            'data_nascimento': forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'type': 'date'},
+            ),
         }

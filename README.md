@@ -33,6 +33,25 @@ git clone LINK_DO_REPOSITORIO
 cd cartao-identidade-aluno
 ```
 
+### Windows
+
+Crie e ative o ambiente virtual:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+Instale as dependencias e inicie o projeto:
+
+```powershell
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+### Linux
+
 Crie e ative o ambiente virtual:
 
 ```bash
@@ -40,28 +59,18 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-Instale as dependencias:
+Instale as dependencias e inicie o projeto:
 
 ```bash
 pip install -r requirements.txt
-```
-
-Execute as migracoes:
-
-```bash
 python manage.py migrate
+python manage.py runserver
 ```
 
-Crie um usuario administrador:
+Crie um usuario administrador, se necessario:
 
 ```bash
 python manage.py createsuperuser
-```
-
-Inicie o servidor:
-
-```bash
-python manage.py runserver
 ```
 
 Acesse no navegador:

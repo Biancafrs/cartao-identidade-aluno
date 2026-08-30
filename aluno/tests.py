@@ -104,6 +104,11 @@ class PaginasAlunoTests(TestCase):
         self.aluno.refresh_from_db()
         self.assertEqual(self.aluno.nome, 'Ana Souza')
 
+    def test_edicao_exibe_data_de_nascimento_no_campo(self):
+        resposta = self.client.get(reverse('alunos:editar_aluno', args=[self.aluno.pk]))
+
+        self.assertContains(resposta, 'value="2000-05-20"')
+
     def test_excluir_aluno(self):
         resposta = self.client.post(reverse('alunos:excluir_aluno', args=[self.aluno.pk]))
         self.assertRedirects(resposta, reverse('alunos:lista'))
