@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AlunoForm
@@ -11,7 +10,7 @@ def lista(request):
     alunos = Aluno.objects.all()
 
     if busca:
-        alunos = alunos.filter(Q(nome__icontains=busca) | Q(cpf__icontains=busca))
+        alunos = alunos.filter(nome__icontains=busca)
     if curso:
         alunos = alunos.filter(curso=curso)
 

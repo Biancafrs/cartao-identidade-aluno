@@ -11,5 +11,6 @@
   <body>
     <header class="cabecalho"><a class="marca" href="{% url 'alunos:lista' %}" aria-label="Página inicial"><img class="marca-logo" src="{% static 'alunos/img/logo-fepi.webp' %}" alt="" aria-hidden="true"><span>Identidade<br><strong>Acadêmica FEPI</strong></span></a><a class="admin-link" href="{% url 'admin:index' %}">Área administrativa <span>↗</span></a></header>
     <main>{% block content %}{% endblock %}</main><footer>Projeto desenvolvido com Django por Bianca Ferreira.</footer>
+    {% block scripts %}{% endblock %}
   </body>
 </html>

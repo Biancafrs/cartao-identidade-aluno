@@ -13,7 +13,7 @@
       <h1>{{ aluno.nome }}</h1>
       <p class="curso">{{ aluno.curso }}</p>
       <dl class="dados-aluno">
-        <div><dt>CPF</dt><dd>{{ aluno.cpf }}</dd></div>
+        <div><dt>CPF</dt><dd>{{ aluno.cpf_mascarado }}</dd></div>
         <div><dt>E-mail institucional</dt><dd>{{ aluno.email_institucional }}</dd></div>
         <div><dt>Data de nascimento</dt><dd>{{ aluno.data_nascimento|date:'d/m/Y' }}</dd></div>
         <div><dt>Endereço</dt><dd>{{ aluno.endereco }}</dd></div>

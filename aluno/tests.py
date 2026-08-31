@@ -56,6 +56,9 @@ class PaginasAlunoTests(TestCase):
         with self.assertRaises(ValidationError):
             self.aluno.full_clean()
 
+    def test_cpf_mascarado_exibe_apenas_parte_dos_numeros(self):
+        self.assertEqual(self.aluno.cpf_mascarado, '***.456.789-**')
+
     def test_criar_aluno_com_os_campos_obrigatorios(self):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos())
         self.assertRedirects(resposta, reverse('alunos:lista'))
@@ -71,10 +74,11 @@ class PaginasAlunoTests(TestCase):
         self.assertContains(resposta, 'Ana Silva')
         self.assertNotContains(resposta, 'Bruno Souza')
 
-    def test_busca_por_cpf(self):
+    def test_busca_nao_filtra_por_cpf(self):
         resposta = self.client.get(reverse('alunos:lista'), {'busca': '987.654'})
-        self.assertContains(resposta, 'Bruno Souza')
+        self.assertContains(resposta, 'Nenhum aluno encontrado')
         self.assertNotContains(resposta, 'Ana Silva')
+        self.assertNotContains(resposta, 'Bruno Souza')
 
     def test_filtro_por_curso(self):
         resposta = self.client.get(reverse('alunos:lista'), {'curso': 'Direito'})
@@ -92,7 +96,8 @@ class PaginasAlunoTests(TestCase):
     def test_detalhe_exibe_os_dados_do_aluno(self):
         resposta = self.client.get(reverse('alunos:detalhe', args=[self.aluno.pk]))
         self.assertContains(resposta, self.aluno.email_institucional)
-        self.assertContains(resposta, self.aluno.cpf)
+        self.assertContains(resposta, self.aluno.cpf_mascarado)
+        self.assertNotContains(resposta, self.aluno.cpf)
         self.assertContains(resposta, self.aluno.endereco)
 
     def test_editar_aluno(self):

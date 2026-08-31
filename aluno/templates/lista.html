@@ -20,7 +20,7 @@
     <a class="botao botao-primario" href="{% url 'alunos:criar_aluno' %}">Novo aluno</a>
   </div>
   <form class="filtros" method="get" role="search">
-    <div class="campo-filtro"><label for="busca">Nome ou CPF</label><input id="busca" type="search" name="busca" value="{{ busca }}" placeholder="Digite um nome ou CPF"></div>
+    <div class="campo-filtro"><label for="busca">Nome</label><input id="busca" type="search" name="busca" value="{{ busca }}" placeholder="Digite um nome"></div>
     <div class="campo-filtro">
       <label for="curso">Curso</label>
       <select id="curso" name="curso">
@@ -49,11 +49,29 @@
               </div>
             </div>
           </div>
-          <p class="curso">{{ aluno.curso }}</p><h3>{{ aluno.nome }}</h3><p class="bio">{{ aluno.bio }}</p><p class="cpf-cartao">CPF: {{ aluno.cpf }}</p>
+          <p class="curso">{{ aluno.curso }}</p><h3>{{ aluno.nome }}</h3><p class="bio">{{ aluno.bio }}</p><p class="cpf-cartao">CPF: {{ aluno.cpf_mascarado }}</p>
           <div class="acoes-cartao"><a href="{% url 'alunos:detalhe' aluno.pk %}">Ver identidade</a></div>
         </article>
       {% endfor %}
     </div>
   {% else %}<div class="vazio"><h3>Nenhum aluno encontrado</h3><p>Revise os filtros ou cadastre um novo aluno.</p></div>{% endif %}
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const formularioFiltros = document.querySelector('.filtros');
+  const posicaoSalva = sessionStorage.getItem('posicaoFiltrosAlunos');
+
+  if (posicaoSalva !== null) {
+    window.scrollTo(0, Number(posicaoSalva));
+    sessionStorage.removeItem('posicaoFiltrosAlunos');
+  }
+
+  if (formularioFiltros) {
+    formularioFiltros.addEventListener('submit', () => {
+      sessionStorage.setItem('posicaoFiltrosAlunos', String(window.scrollY));
+    });
+  }
+</script>
 {% endblock %}
