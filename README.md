@@ -83,7 +83,6 @@ http://127.0.0.1:8000/
 
 | Endpoint                | Descricao                                    |
 | ----------------------- | -------------------------------------------- |
-| `/`                     | Redireciona para a lista de alunos           |
 | `/aluno/`               | Lista todos os cartoes de alunos cadastrados |
 | `/aluno/novo/`          | Exibe o formulario para cadastrar aluno      |
 | `/aluno/<id>/`          | Exibe os detalhes de um aluno especifico     |
