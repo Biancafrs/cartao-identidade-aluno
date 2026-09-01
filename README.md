@@ -40,7 +40,7 @@ Crie e ative o ambiente virtual:
 
 ```powershell
 python -m venv venv
-.\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate
 ```
 
 Instale as dependencias e inicie o projeto:
