@@ -8,6 +8,15 @@ def validar_email_institucional(email):
         raise ValidationError('Use um e-mail institucional terminado em @fepi.edu.br.')
 
 
+def formatar_cpf(cpf):
+    numeros = ''.join(caractere for caractere in cpf if caractere.isdigit())
+    return f'{numeros[:3]}.{numeros[3:6]}.{numeros[6:9]}-{numeros[9:]}'
+
+
+def somente_numeros(cpf):
+    return ''.join(caractere for caractere in cpf if caractere.isdigit())
+
+
 class Aluno(models.Model):
     nome = models.CharField(max_length=100)
     curso = models.CharField(max_length=100)
@@ -22,8 +31,8 @@ class Aluno(models.Model):
         max_length=14,
         validators=[
             RegexValidator(
-                regex=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$',
-                message='Informe o CPF no formato 000.000.000-00.',
+                regex=r'^(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})$',
+                message='Informe os 11 números do CPF.',
             )
         ],
     )
@@ -32,8 +41,16 @@ class Aluno(models.Model):
     ativo = models.BooleanField(default=True)
 
     @property
+    def cpf_formatado(self):
+        return formatar_cpf(self.cpf)
+
+    def save(self, *args, **kwargs):
+        self.cpf = somente_numeros(self.cpf)
+        super().save(*args, **kwargs)
+
+    @property
     def cpf_mascarado(self):
-        numeros = ''.join(caractere for caractere in self.cpf if caractere.isdigit())
+        numeros = somente_numeros(self.cpf)
 
         if len(numeros) != 11:
             return '***.***.***-**'

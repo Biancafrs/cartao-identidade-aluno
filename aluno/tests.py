@@ -70,6 +70,38 @@ class PaginasAlunoTests(TestCase):
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.assertTrue(Aluno.objects.filter(nome='Carlos Lima').exists())
 
+    def test_cpf_aceita_apenas_numeros_e_salva_formatado(self):
+        resposta = self.client.post(
+            reverse('alunos:criar_aluno'),
+            self.dados_validos(cpf='11122233344'),
+        )
+
+        self.assertRedirects(resposta, reverse('alunos:lista'))
+        self.assertEqual(Aluno.objects.get(nome='Carlos Lima').cpf, '11122233344')
+
+    def test_cpf_tambem_aceita_valor_colado_com_mascara(self):
+        resposta = self.client.post(
+            reverse('alunos:criar_aluno'),
+            self.dados_validos(cpf='111.222.333-44'),
+        )
+
+        self.assertRedirects(resposta, reverse('alunos:lista'))
+        self.assertEqual(Aluno.objects.get(nome='Carlos Lima').cpf, '11122233344')
+
+    def test_modelo_remove_mascara_antes_de_salvar(self):
+        self.aluno.cpf = '123.456.789-00'
+        self.aluno.save()
+        self.aluno.refresh_from_db()
+
+        self.assertEqual(self.aluno.cpf, '12345678900')
+        self.assertEqual(self.aluno.cpf_formatado, '123.456.789-00')
+
+    def test_cpf_rejeita_quantidade_incorreta_de_numeros(self):
+        form = AlunoForm(data=self.dados_validos(cpf='111222333'))
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('Informe os 11 números do CPF.', form.errors['cpf'])
+
     def test_formulario_rejeita_campo_obrigatorio_ausente(self):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos(cpf=''))
         self.assertEqual(resposta.status_code, 200)
