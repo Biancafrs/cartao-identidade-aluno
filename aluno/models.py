@@ -11,6 +11,7 @@ def validar_email_institucional(email):
 class Aluno(models.Model):
     nome = models.CharField(max_length=100)
     curso = models.CharField(max_length=100)
+    periodo = models.PositiveSmallIntegerField(default=1)
     bio = models.TextField(max_length=280)
     matriculado_em = models.DateTimeField(auto_now_add=True)
     email_institucional = models.EmailField(
@@ -28,6 +29,7 @@ class Aluno(models.Model):
     )
     endereco = models.CharField(max_length=200)
     data_nascimento = models.DateField()
+    ativo = models.BooleanField(default=True)
 
     @property
     def cpf_mascarado(self):
@@ -40,3 +42,8 @@ class Aluno(models.Model):
 
     def __str__(self):
         return self.nome
+
+    class Meta:
+        ordering = ['nome']
+        verbose_name = 'Aluno'
+        verbose_name_plural = 'Alunos'

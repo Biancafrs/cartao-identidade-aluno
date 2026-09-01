@@ -5,7 +5,8 @@ Projeto desenvolvido com Django para exibir cartoes de identidade academica dos 
 ## Requisitos Atendidos
 
 - Uso do framework Django.
-- Modelo `Aluno` com oito campos obrigatórios.
+- Modelo `Aluno` com dez campos.
+- Pelo menos cinco campos de texto, um campo numerico, campos de data/data-hora e um campo booleano.
 - Data e hora da matrícula registradas automaticamente.
 - Validação de e-mail institucional `@fepi.edu.br`.
 - Busca por nome e filtro por curso.
@@ -81,14 +82,14 @@ http://127.0.0.1:8000/
 
 ## Endpoints Disponiveis
 
-| Endpoint                | Descricao                                    |
-| ----------------------- | -------------------------------------------- |
-| `/aluno/`               | Lista todos os cartoes de alunos cadastrados |
-| `/aluno/novo/`          | Exibe o formulario para cadastrar aluno      |
-| `/aluno/<id>/`          | Exibe os detalhes de um aluno especifico     |
-| `/aluno/<id>/editar/`   | Exibe o formulario para editar aluno         |
-| `/aluno/<id>/excluir/`  | Exibe a confirmacao para excluir aluno       |
-| `/admin/`               | Area administrativa do Django                |
+| Endpoint               | Descricao                                    |
+| ---------------------- | -------------------------------------------- |
+| `/aluno/`              | Lista todos os cartoes de alunos cadastrados |
+| `/aluno/novo/`         | Exibe o formulario para cadastrar aluno      |
+| `/aluno/<id>/`         | Exibe os detalhes de um aluno especifico     |
+| `/aluno/<id>/editar/`  | Exibe o formulario para editar aluno         |
+| `/aluno/<id>/excluir/` | Exibe a confirmacao para excluir aluno       |
+| `/admin/`              | Area administrativa do Django                |
 
 ## Modelo de Dados
 
@@ -96,13 +97,40 @@ http://127.0.0.1:8000/
 class Aluno(models.Model):
     nome = models.CharField(max_length=100)
     curso = models.CharField(max_length=100)
+    periodo = models.PositiveSmallIntegerField(default=1)
     bio = models.TextField(max_length=280)
     matriculado_em = models.DateTimeField(auto_now_add=True)
-    email_institucional = models.EmailField()
+    email_institucional = models.EmailField(max_length=254)
     cpf = models.CharField(max_length=14)
     endereco = models.CharField(max_length=200)
     data_nascimento = models.DateField()
+    ativo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['nome']
+        verbose_name = 'Aluno'
+        verbose_name_plural = 'Alunos'
 ```
+
+Campos do model:
+
+| Campo                 | Tipo                        | Finalidade                                                         |
+| --------------------- | --------------------------- | ------------------------------------------------------------------ |
+| `nome`                | `CharField`                 | Nome do aluno                                                      |
+| `curso`               | `CharField`                 | Curso do aluno                                                     |
+| `periodo`             | `PositiveSmallIntegerField` | Periodo atual do aluno                                             |
+| `bio`                 | `TextField`                 | Breve biografia, limitada a 280 caracteres                         |
+| `matriculado_em`      | `DateTimeField`             | Data e hora da matricula, preenchida automaticamente               |
+| `email_institucional` | `EmailField`                | E-mail institucional do aluno, validado com dominio `@fepi.edu.br` |
+| `cpf`                 | `CharField`                 | CPF do aluno, validado no formato `000.000.000-00`                 |
+| `endereco`            | `CharField`                 | Endereco do aluno                                                  |
+| `data_nascimento`     | `DateField`                 | Data de nascimento do aluno                                        |
+| `ativo`               | `BooleanField`              | Indica se o cadastro esta ativo                                    |
+
+O model tambem possui:
+
+- `cpf_mascarado`: propriedade usada para exibir o CPF parcialmente oculto nas telas publicas.
+- `Meta`: configura a ordenacao padrao por nome e os nomes exibidos no Django Admin.
 
 ## Como Cadastrar, Editar e Excluir Alunos
 
@@ -129,7 +157,6 @@ Pelo Django Admin:
 <img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/84c7fc61-9707-4643-b4e7-b5f3b7f8cf53" />
 
 <img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/9d9923bc-4aea-42da-8ab3-6e733cff455c" />
-
 
 ## Observacao Sobre Uso de IA
 

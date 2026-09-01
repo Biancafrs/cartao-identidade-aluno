@@ -49,7 +49,7 @@
               </div>
             </div>
           </div>
-          <p class="curso">{{ aluno.curso }}</p><h3>{{ aluno.nome }}</h3><p class="bio">{{ aluno.bio }}</p><p class="cpf-cartao">CPF: {{ aluno.cpf_mascarado }}</p>
+          <p class="curso">{{ aluno.curso }} · {{ aluno.periodo }}º período</p><h3>{{ aluno.nome }}</h3><p class="bio">{{ aluno.bio }}</p><p class="cpf-cartao">CPF: {{ aluno.cpf_mascarado }} · {% if aluno.ativo %}Ativo{% else %}Inativo{% endif %}</p>
           <div class="acoes-cartao"><a href="{% url 'alunos:detalhe' aluno.pk %}">Ver identidade</a></div>
         </article>
       {% endfor %}

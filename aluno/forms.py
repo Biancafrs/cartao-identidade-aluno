@@ -8,21 +8,26 @@ class AlunoForm(forms.ModelForm):
         model = Aluno
         fields = (
             'nome',
-            'bio',
             'curso',
+            'periodo',
+            'bio',
             'email_institucional',
             'cpf',
             'endereco',
             'data_nascimento',
+            'ativo',
         )
         labels = {
+            'periodo': 'Período',
             'bio': 'Biografia',
             'email_institucional': 'E-mail institucional',
             'cpf': 'CPF',
             'endereco': 'Endereço',
             'data_nascimento': 'Data de nascimento',
+            'ativo': 'Aluno ativo',
         }
         help_texts = {
+            'periodo': 'Informe o período atual do aluno.',
             'bio': 'Até 280 caracteres.',
             'email_institucional': 'Use um endereço terminado em @fepi.edu.br.',
         }

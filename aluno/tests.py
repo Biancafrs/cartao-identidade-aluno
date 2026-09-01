@@ -14,31 +14,37 @@ class PaginasAlunoTests(TestCase):
         cls.aluno = Aluno.objects.create(
             nome='Ana Silva',
             curso='Engenharia de Software',
+            periodo=4,
             bio='Estudante e pesquisadora.',
             email_institucional='ana@fepi.edu.br',
             cpf='123.456.789-00',
             endereco='Rua das Flores, 10',
             data_nascimento=date(2000, 5, 20),
+            ativo=True,
         )
         cls.outro_aluno = Aluno.objects.create(
             nome='Bruno Souza',
             curso='Direito',
+            periodo=2,
             bio='Estudante de Direito.',
             email_institucional='bruno@fepi.edu.br',
             cpf='987.654.321-00',
             endereco='Avenida Central, 20',
             data_nascimento=date(1999, 8, 10),
+            ativo=True,
         )
 
     def dados_validos(self, **alteracoes):
         dados = {
             'nome': 'Carlos Lima',
             'curso': 'Medicina',
+            'periodo': 1,
             'bio': 'Aluno.',
             'email_institucional': 'carlos@fepi.edu.br',
             'cpf': '111.222.333-44',
             'endereco': 'Rua Principal, 30',
             'data_nascimento': '2001-03-15',
+            'ativo': 'on',
         }
         dados.update(alteracoes)
         return dados
@@ -99,6 +105,8 @@ class PaginasAlunoTests(TestCase):
         self.assertContains(resposta, self.aluno.cpf_mascarado)
         self.assertNotContains(resposta, self.aluno.cpf)
         self.assertContains(resposta, self.aluno.endereco)
+        self.assertContains(resposta, '4º período')
+        self.assertContains(resposta, 'Ativo')
 
     def test_editar_aluno(self):
         resposta = self.client.post(

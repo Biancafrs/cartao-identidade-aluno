@@ -6,13 +6,15 @@
   <article class="identidade">
     <div class="identidade-lateral">
       <span class="avatar avatar-grande" aria-hidden="true">{{ aluno.nome|first|upper }}</span>
-      <span class="status"><i></i> Perfil ativo</span>
+      <span class="status"><i></i> {% if aluno.ativo %}Perfil ativo{% else %}Perfil inativo{% endif %}</span>
     </div>
     <div class="identidade-conteudo">
       <p class="etiqueta">IDENTIDADE · {{ aluno.pk|stringformat:'04d' }}</p>
       <h1>{{ aluno.nome }}</h1>
       <p class="curso">{{ aluno.curso }}</p>
       <dl class="dados-aluno">
+        <div><dt>Período</dt><dd>{{ aluno.periodo }}º período</dd></div>
+        <div><dt>Situação</dt><dd>{% if aluno.ativo %}Ativo{% else %}Inativo{% endif %}</dd></div>
         <div><dt>CPF</dt><dd>{{ aluno.cpf_mascarado }}</dd></div>
         <div><dt>E-mail institucional</dt><dd>{{ aluno.email_institucional }}</dd></div>
         <div><dt>Data de nascimento</dt><dd>{{ aluno.data_nascimento|date:'d/m/Y' }}</dd></div>
