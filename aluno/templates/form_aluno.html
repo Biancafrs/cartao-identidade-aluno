@@ -11,16 +11,21 @@
       {% csrf_token %}
       {% if form.non_field_errors %}<div class="erros-formulario">{{ form.non_field_errors }}</div>{% endif %}
       {% for field in form %}
-        <div class="campo">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
+        <div class="campo{% if field.field.widget.input_type == 'checkbox' %} campo-checkbox{% endif %}">
+          {% if field.field.widget.input_type == 'checkbox' %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          {% else %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          {% endif %}
           {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
           {% for error in field.errors %}<span class="erro-campo">{{ error }}</span>{% endfor %}
         </div>
       {% endfor %}
       <div class="acoes-formulario">
-        <button class="botao botao-primario" type="submit">Salvar</button>
         <a class="botao botao-secundario" href="{% url 'alunos:lista' %}">Cancelar</a>
+        <button class="botao botao-primario" type="submit">Salvar</button>
       </div>
     </form>
   </div>

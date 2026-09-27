@@ -9,7 +9,7 @@ Repositório: <https://github.com/Biancafrs/cartao-identidade-aluno>
 - `python manage.py check`: nenhum problema identificado.
 - `python manage.py makemigrations --check --dry-run`: nenhuma alteração faltando.
 - `python manage.py migrate`: nenhuma migration pendente.
-- `python manage.py test`: 24 testes aprovados.
+- `python manage.py test`: 28 testes aprovados.
 - Migração validada em banco vazio e a partir de `aluno.0004` com alunos existentes.
 - Dados anteriores comparados antes/depois da migração, sem perda de IDs ou campos.
 - `popular_demo` executado duas vezes sem duplicar seus registros.
@@ -32,7 +32,7 @@ Repositório: <https://github.com/Biancafrs/cartao-identidade-aluno>
 - [x] Indicadores calculados com dados persistidos e atualizados após alterações.
 - [x] Dashboard vazio tratado e apresentação responsiva conferida.
 - [x] CRUD, detalhe, busca, filtro e validações preservados.
-- [x] Verificações e 24 testes executados com sucesso.
+- [x] Verificações e 28 testes executados com sucesso.
 - [x] Dados de demonstração reproduzíveis sem versionar o SQLite.
 - [x] README, diagrama e instruções atualizados.
 - [x] Prints da funcionalidade salvos e incluídos na entrega.

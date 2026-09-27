@@ -1,12 +1,15 @@
 from django.contrib import admin
+
+from .forms import AlunoForm
 from .models import Aluno, Curso, Disciplina, Turma
 
 
 @admin.register(Aluno)
 class AlunoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'curso', 'ativo', 'cpf', 'email_institucional', 'matriculado_em')
+    form = AlunoForm
+    list_display = ('nome', 'curso', 'periodo', 'ativo', 'cpf_formatado', 'email_institucional', 'matriculado_em')
     search_fields = ('nome', 'cpf', 'curso__nome')
-    list_filter = ('ativo', 'curso')
+    list_filter = ('ativo', 'curso', 'periodo')
     readonly_fields = ('matriculado_em',)
 
 

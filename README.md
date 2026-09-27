@@ -118,7 +118,7 @@ python manage.py migrate
 python manage.py test
 ```
 
-A entrega foi validada com 24 testes, incluindo CRUD, filtros, dashboard vazio, indicadores, agrupamento, proteção das relações e idempotência do comando de demonstração.
+A entrega foi validada com 28 testes, incluindo CRUD, CPF, filtros, dashboard vazio, indicadores, agrupamento, proteção das relações e idempotência do comando de demonstração.
 
 ## Evidências
 

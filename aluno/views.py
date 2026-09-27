@@ -2,7 +2,7 @@ from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AlunoForm
-from .models import Aluno, Curso, Disciplina, Turma
+from .models import Aluno, Curso, Disciplina, Turma, somente_numeros
 
 
 def dashboard(request):
@@ -28,7 +28,11 @@ def lista(request):
     alunos = Aluno.objects.select_related('curso')
 
     if busca:
-        alunos = alunos.filter(Q(nome__icontains=busca) | Q(cpf__icontains=busca))
+        filtro_busca = Q(nome__icontains=busca)
+        cpf_busca = somente_numeros(busca)
+        if cpf_busca:
+            filtro_busca |= Q(cpf__icontains=cpf_busca)
+        alunos = alunos.filter(filtro_busca)
     if curso:
         alunos = alunos.filter(curso__nome=curso)
 

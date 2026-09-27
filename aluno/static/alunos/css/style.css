@@ -584,6 +584,23 @@ a {
     font: inherit;
 }
 
+.campo-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 36px;
+}
+
+.campo-checkbox input[type="checkbox"] {
+    display: block;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--azul);
+}
+
 .campo textarea {
     resize: vertical;
 }
@@ -608,10 +625,19 @@ a {
 }
 
 .acoes-formulario {
-    display: flex;
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
     margin-top: 28px;
     gap: 12px;
-    flex-wrap: wrap;
+}
+
+.acoes-formulario .botao-secundario {
+    justify-self: start;
+}
+
+.acoes-formulario .botao-primario {
+    justify-self: end;
 }
 
 .botao {
