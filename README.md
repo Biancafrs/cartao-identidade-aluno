@@ -1,125 +1,143 @@
-# Cartao de Identidade Academica
+# Cartão de Identidade Acadêmica
 
-Projeto desenvolvido com Django para exibir cartoes de identidade academica dos alunos da FEPI.
+Projeto Django para cadastro e consulta de identidades acadêmicas dos alunos da FEPI.
 
-## Requisitos Atendidos
+Repositório: <https://github.com/Biancafrs/cartao-identidade-aluno>
 
-- Uso do framework Django.
-- Modelo `Aluno` com oito campos obrigatórios.
-- Data e hora da matrícula registradas automaticamente.
-- Validação de e-mail institucional `@fepi.edu.br`.
-- Busca por nome ou CPF e filtro por curso.
-- Front-end exibindo os cartoes dos alunos.
-- Pagina de listagem dos alunos.
-- Pagina de detalhes de cada aluno.
-- Cadastro e gerenciamento pelo Django Admin.
-- Identidade visual com cores azul e amarelo da FEPI.
-- Favicon e logo da FEPI nos arquivos estaticos.
+## Entrega da semana 1
+
+A entrega inclui:
+
+- quatro models de domínio: `Aluno`, `Curso`, `Disciplina` e `Turma`;
+- relações 1:N protegidas contra exclusão acidental;
+- migração dos cursos textuais existentes para registros de `Curso`;
+- dashboard com indicadores calculados a partir do banco;
+- CRUD de alunos, busca por nome ou CPF e filtro por curso;
+- dados demonstrativos reproduzíveis e testes automatizados.
 
 ## Tecnologias
 
-- Python 3.12
-- Django 6.1
-- SQLite
-- HTML
-- CSS
+- Python 3.12 ou mais recente compatível com Django 6.1;
+- Django 6.1;
+- SQLite;
+- HTML e CSS.
 
-## Como Instalar e Executar
+O desenvolvimento foi validado localmente com Python 3.14.7 e Django 6.1.
 
-Clone o repositorio:
+## Instalação
+
+Clone o repositório:
 
 ```bash
-git clone LINK_DO_REPOSITORIO
+git clone https://github.com/Biancafrs/cartao-identidade-aluno.git
 cd cartao-identidade-aluno
 ```
 
-### Windows
-
-Crie e ative o ambiente virtual:
+No Windows:
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-```
-
-Instale as dependencias e inicie o projeto:
-
-```powershell
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python manage.py migrate
-python manage.py runserver
 ```
 
-### Linux
-
-Crie e ative o ambiente virtual:
+No Linux:
 
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-```
-
-Instale as dependencias e inicie o projeto:
-
-```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python manage.py migrate
-python manage.py runserver
 ```
 
-Crie um usuario administrador, se necessario:
+Para acessar a área administrativa, crie um usuário local. Nenhuma credencial é mantida no código:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Acesse no navegador:
+Inicie o servidor:
 
-```text
-http://127.0.0.1:8000/
+```bash
+python manage.py runserver
 ```
 
-## Endpoints Disponiveis
+Acesse <http://127.0.0.1:8000/>.
 
-| Endpoint       | Descricao                                    |
-| -------------- | -------------------------------------------- |
-| `/`            | Redireciona para a lista de alunos           |
-| `/aluno/`      | Lista todos os cartoes de alunos cadastrados |
-| `/aluno/<id>/` | Exibe os detalhes de um aluno especifico     |
-| `/admin/`      | Area administrativa do Django                |
+## Dados de demonstração
 
-## Modelo de Dados
+O comando abaixo cria ou atualiza dados fictícios sem apagar registros existentes:
 
-```python
-class Aluno(models.Model):
-    nome = models.CharField(max_length=100)
-    curso = models.CharField(max_length=100)
-    bio = models.TextField(max_length=280)
-    matriculado_em = models.DateTimeField(auto_now_add=True)
-    email_institucional = models.EmailField()
-    cpf = models.CharField(max_length=14)
-    endereco = models.CharField(max_length=200)
-    data_nascimento = models.DateField()
+```bash
+python manage.py popular_demo
 ```
 
-## Como Cadastrar Alunos
+Em um banco vazio, o resultado é:
 
-1. Acesse `http://127.0.0.1:8000/admin/`.
-2. Entre com o usuario administrador.
-3. Clique em `Alunos`.
-4. Preencha os campos obrigatórios do aluno.
-5. Salve o registro.
-6. Acesse `/aluno/` para visualizar os cartoes.
+- 4 alunos, sendo 3 ativos e 1 inativo;
+- 2 cursos, com 2 alunos em cada;
+- 2 disciplinas;
+- 2 turmas.
 
-## Prints do projeto
+O comando usa identificadores estáveis e pode ser executado novamente sem duplicar seus registros.
 
-<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/9989f783-c2ce-4028-a0a7-7ece3a4b8ccd" />
+## Rotas
 
-<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/84c7fc61-9707-4643-b4e7-b5f3b7f8cf53" />
+| Rota | Função |
+| --- | --- |
+| `/` | Dashboard com indicadores e alunos por curso |
+| `/aluno/` | Listagem, busca e filtro de alunos |
+| `/aluno/novo/` | Cadastro de aluno |
+| `/aluno/<id>/` | Detalhes do aluno |
+| `/aluno/<id>/editar/` | Edição do aluno |
+| `/aluno/<id>/excluir/` | Confirmação de exclusão |
+| `/admin/` | Administração de alunos, cursos, disciplinas e turmas |
 
-<img width="1886" height="847" alt="image" src="https://github.com/user-attachments/assets/9d9923bc-4aea-42da-8ab3-6e733cff455c" />
+## Modelo de dados
 
+```mermaid
+erDiagram
+    CURSO ||--o{ ALUNO : possui
+    CURSO ||--o{ DISCIPLINA : oferece
+    DISCIPLINA ||--o{ TURMA : possui
+```
 
-## Observacao Sobre Uso de IA
+- `Aluno.curso` usa `ForeignKey` com `related_name="alunos"`.
+- `Disciplina.curso` usa `ForeignKey` com `related_name="disciplinas"`.
+- `Turma.disciplina` usa `ForeignKey` com `related_name="turmas"`.
+- Todas as relações usam `PROTECT` para preservar registros dependentes.
+- Carga horária e ano devem ser positivos; semestre aceita apenas 1 ou 2.
 
-Ferramentas de IA foram usadas de forma moderada para apoio e aprendizagem do desenvolvimento front-end.
+## Verificação
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py migrate
+python manage.py test
+```
+
+A entrega foi validada com 24 testes, incluindo CRUD, filtros, dashboard vazio, indicadores, agrupamento, proteção das relações e idempotência do comando de demonstração.
+
+## Evidências
+
+### Dashboard em desktop
+
+![Dashboard em desktop](docs/entregas/semana-1/dashboard.png)
+
+### Dashboard em tela estreita
+
+![Dashboard em tela estreita](docs/entregas/semana-1/dashboard-mobile.png)
+
+O checklist detalhado está em [docs/entregas/semana-1/README.md](docs/entregas/semana-1/README.md).
+
+## Autoria
+
+- Bianca Ferreira — autoria identificada no repositório.
+
+O nome e a participação do segundo integrante ainda precisam ser informados antes do envio da entrega.
+
+## Uso de IA
+
+Ferramentas de IA foram usadas como apoio ao planejamento, implementação, testes e documentação. O resultado foi verificado por comandos automatizados e inspeção visual.
