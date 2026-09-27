@@ -11,7 +11,7 @@
     <div class="identidade-conteudo">
       <p class="etiqueta">IDENTIDADE · {{ aluno.pk|stringformat:'04d' }}</p>
       <h1>{{ aluno.nome }}</h1>
-      <p class="curso">{{ aluno.curso }}</p>
+      <p class="curso">{{ aluno.curso.nome }}</p>
       <dl class="dados-aluno">
         <div><dt>CPF</dt><dd>{{ aluno.cpf }}</dd></div>
         <div><dt>E-mail institucional</dt><dd>{{ aluno.email_institucional }}</dd></div>

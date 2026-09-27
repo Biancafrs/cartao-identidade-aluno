@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="dashboard-pagina">
+  <div class="dashboard-cabecalho">
+    <div>
+      <p class="etiqueta">VISÃO GERAL · FEPI</p>
+      <h1>Dashboard acadêmico</h1>
+      <p>Acompanhe os dados cadastrados no sistema em tempo real.</p>
+    </div>
+    <a class="botao botao-primario" href="{% url 'alunos:criar_aluno' %}">Novo aluno</a>
+  </div>
+  <div class="grade-indicadores" aria-label="Indicadores acadêmicos">
+    <article class="indicador indicador-destaque"><span>Total de alunos</span><strong>{{ total }}</strong></article>
+    <article class="indicador"><span>Alunos ativos</span><strong>{{ ativos }}</strong></article>
+    <article class="indicador"><span>Alunos inativos</span><strong>{{ inativos }}</strong></article>
+    <article class="indicador"><span>Cursos</span><strong>{{ total_cursos }}</strong></article>
+    <article class="indicador"><span>Disciplinas</span><strong>{{ total_disciplinas }}</strong></article>
+    <article class="indicador"><span>Turmas</span><strong>{{ total_turmas }}</strong></article>
+  </div>
+  <section class="painel-distribuicao" aria-labelledby="titulo-distribuicao">
+    <div class="painel-titulo">
+      <div><span>Distribuição</span><h2 id="titulo-distribuicao">Alunos por curso</h2></div>
+      <a href="{% url 'alunos:lista' %}">Ver todos os alunos →</a>
+    </div>
+    {% if cursos %}
+      <div class="tabela-responsiva">
+        <table class="tabela-dashboard">
+          <thead><tr><th scope="col">Curso</th><th scope="col">Situação</th><th scope="col">Alunos</th></tr></thead>
+          <tbody>
+            {% for curso in cursos %}
+              <tr><td>{{ curso.nome }}</td><td>{% if curso.ativo %}Ativo{% else %}Inativo{% endif %}</td><td><strong>{{ curso.total_alunos }}</strong></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="dashboard-vazio"><h3>Nenhum curso cadastrado</h3><p>Cadastre cursos na área administrativa para iniciar a distribuição.</p></div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

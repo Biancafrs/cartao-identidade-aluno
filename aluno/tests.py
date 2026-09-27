@@ -1,19 +1,24 @@
 from datetime import date
 
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
 
 from .forms import AlunoForm
-from .models import Aluno
+from .models import Aluno, Curso, Disciplina, Turma
 
 
 class PaginasAlunoTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.curso_engenharia = Curso.objects.create(nome='Engenharia de Software')
+        cls.curso_direito = Curso.objects.create(nome='Direito')
+        cls.curso_medicina = Curso.objects.create(nome='Medicina')
         cls.aluno = Aluno.objects.create(
             nome='Ana Silva',
-            curso='Engenharia de Software',
+            curso=cls.curso_engenharia,
             bio='Estudante e pesquisadora.',
             email_institucional='ana@fepi.edu.br',
             cpf='123.456.789-00',
@@ -22,7 +27,7 @@ class PaginasAlunoTests(TestCase):
         )
         cls.outro_aluno = Aluno.objects.create(
             nome='Bruno Souza',
-            curso='Direito',
+            curso=cls.curso_direito,
             bio='Estudante de Direito.',
             email_institucional='bruno@fepi.edu.br',
             cpf='987.654.321-00',
@@ -33,7 +38,7 @@ class PaginasAlunoTests(TestCase):
     def dados_validos(self, **alteracoes):
         dados = {
             'nome': 'Carlos Lima',
-            'curso': 'Medicina',
+            'curso': self.curso_medicina.pk,
             'bio': 'Aluno.',
             'email_institucional': 'carlos@fepi.edu.br',
             'cpf': '111.222.333-44',
@@ -60,6 +65,11 @@ class PaginasAlunoTests(TestCase):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos())
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.assertTrue(Aluno.objects.filter(nome='Carlos Lima').exists())
+
+    def test_formulario_rejeita_curso_inexistente(self):
+        form = AlunoForm(data=self.dados_validos(curso=999999))
+        self.assertFalse(form.is_valid())
+        self.assertIn('curso', form.errors)
 
     def test_formulario_rejeita_campo_obrigatorio_ausente(self):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos(cpf=''))
@@ -113,3 +123,145 @@ class PaginasAlunoTests(TestCase):
         resposta = self.client.post(reverse('alunos:excluir_aluno', args=[self.aluno.pk]))
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.assertFalse(Aluno.objects.filter(pk=self.aluno.pk).exists())
+
+    def test_curso_com_aluno_nao_pode_ser_excluido(self):
+        with self.assertRaises(ProtectedError):
+            self.curso_engenharia.delete()
+
+    def test_edicao_mantem_curso_inativo_disponivel(self):
+        self.curso_engenharia.ativo = False
+        self.curso_engenharia.save(update_fields=['ativo'])
+
+        form = AlunoForm(instance=self.aluno)
+
+        self.assertIn(self.curso_engenharia, form.fields['curso'].queryset)
+        self.assertNotIn(self.curso_engenharia, AlunoForm().fields['curso'].queryset)
+
+
+class DashboardVazioTests(TestCase):
+    def test_dashboard_vazio_exibe_zeros_e_orientacao(self):
+        resposta = self.client.get(reverse('home'))
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.context['total'], 0)
+        self.assertEqual(resposta.context['ativos'], 0)
+        self.assertEqual(resposta.context['inativos'], 0)
+        self.assertContains(resposta, 'Nenhum curso cadastrado')
+
+
+class DashboardTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.curso_direito = Curso.objects.create(nome='Direito')
+        cls.curso_computacao = Curso.objects.create(nome='Computação')
+        cls.disciplina = Disciplina.objects.create(
+            nome='Algoritmos',
+            codigo='COMP-001',
+            carga_horaria=80,
+            curso=cls.curso_computacao,
+        )
+        Turma.objects.create(
+            codigo='COMP-001-2026-1',
+            ano=2026,
+            semestre=1,
+            disciplina=cls.disciplina,
+        )
+        dados_aluno = {
+            'bio': 'Aluno.',
+            'cpf': '000.000.000-00',
+            'endereco': 'Rua Acadêmica',
+            'data_nascimento': date(2000, 1, 1),
+        }
+        cls.aluno_ativo = Aluno.objects.create(
+            nome='Aluno Ativo',
+            curso=cls.curso_computacao,
+            email_institucional='ativo@fepi.edu.br',
+            **dados_aluno,
+        )
+        cls.aluno_inativo = Aluno.objects.create(
+            nome='Aluno Inativo',
+            curso=cls.curso_computacao,
+            email_institucional='inativo@fepi.edu.br',
+            ativo=False,
+            **dados_aluno,
+        )
+
+    def test_dashboard_exibe_totais_reais(self):
+        resposta = self.client.get(reverse('home'))
+
+        self.assertEqual(resposta.context['total'], 2)
+        self.assertEqual(resposta.context['ativos'], 1)
+        self.assertEqual(resposta.context['inativos'], 1)
+        self.assertEqual(resposta.context['total_cursos'], 2)
+        self.assertEqual(resposta.context['total_disciplinas'], 1)
+        self.assertEqual(resposta.context['total_turmas'], 1)
+
+    def test_dashboard_agrupa_alunos_e_inclui_curso_sem_alunos(self):
+        resposta = self.client.get(reverse('home'))
+        distribuicao = {
+            curso.nome: curso.total_alunos for curso in resposta.context['cursos']
+        }
+
+        self.assertEqual(distribuicao, {'Computação': 2, 'Direito': 0})
+
+    def test_dashboard_atualiza_apos_alteracao(self):
+        self.aluno_inativo.ativo = True
+        self.aluno_inativo.save(update_fields=['ativo'])
+
+        resposta = self.client.get(reverse('home'))
+
+        self.assertEqual(resposta.context['ativos'], 2)
+        self.assertEqual(resposta.context['inativos'], 0)
+
+    def test_dashboard_e_listagem_sao_telas_distintas(self):
+        dashboard = self.client.get(reverse('home'))
+        listagem = self.client.get(reverse('alunos:lista'))
+
+        self.assertContains(dashboard, 'Dashboard acadêmico')
+        self.assertNotContains(listagem, 'Dashboard acadêmico')
+
+
+class PopularDemoTests(TestCase):
+    def test_comando_cria_dados_esperados_em_banco_vazio(self):
+        call_command('popular_demo', verbosity=0)
+
+        self.assertEqual(Aluno.objects.count(), 4)
+        self.assertEqual(Aluno.objects.filter(ativo=True).count(), 3)
+        self.assertEqual(Aluno.objects.filter(ativo=False).count(), 1)
+        self.assertEqual(Curso.objects.count(), 2)
+        self.assertEqual(Disciplina.objects.count(), 2)
+        self.assertEqual(Turma.objects.count(), 2)
+        self.assertTrue(all(curso.alunos.count() == 2 for curso in Curso.objects.all()))
+
+    def test_comando_e_idempotente(self):
+        call_command('popular_demo', verbosity=0)
+        primeira_execucao = (
+            Aluno.objects.count(),
+            Curso.objects.count(),
+            Disciplina.objects.count(),
+            Turma.objects.count(),
+        )
+
+        call_command('popular_demo', verbosity=0)
+
+        self.assertEqual(
+            primeira_execucao,
+            (
+                Aluno.objects.count(),
+                Curso.objects.count(),
+                Disciplina.objects.count(),
+                Turma.objects.count(),
+            ),
+        )
+
+    def test_dashboard_reflete_dados_populados(self):
+        call_command('popular_demo', verbosity=0)
+
+        resposta = self.client.get(reverse('home'))
+
+        self.assertEqual(resposta.context['total'], 4)
+        self.assertEqual(resposta.context['ativos'], 3)
+        self.assertEqual(resposta.context['inativos'], 1)
+        self.assertEqual(resposta.context['total_cursos'], 2)
+        self.assertEqual(resposta.context['total_disciplinas'], 2)
+        self.assertEqual(resposta.context['total_turmas'], 2)
