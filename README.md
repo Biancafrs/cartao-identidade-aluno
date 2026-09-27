@@ -124,20 +124,14 @@ A entrega foi validada com 28 testes, incluindo CRUD, CPF, filtros, dashboard va
 
 ### Dashboard em desktop
 
-![Dashboard em desktop](docs/entregas/semana-1/dashboard.png)
-
-### Dashboard em tela estreita
-
-![Dashboard em tela estreita](docs/entregas/semana-1/dashboard-mobile.png)
+<img width="1440" height="896" alt="image" src="https://github.com/user-attachments/assets/b208b039-fa92-4290-84f1-639d578b8421" />
 
 O checklist detalhado está em [docs/entregas/semana-1/README.md](docs/entregas/semana-1/README.md).
 
 ## Autoria
 
-- Bianca Ferreira — autoria identificada no repositório.
-
-O nome e a participação do segundo integrante ainda precisam ser informados antes do envio da entrega.
+- Bianca Ferreira
 
 ## Uso de IA
 
-Ferramentas de IA foram usadas como apoio ao planejamento, implementação, testes e documentação. O resultado foi verificado por comandos automatizados e inspeção visual.
+Ferramentas de IA foram usadas como apoio ao planejamento, implementação, testes e documentação.
