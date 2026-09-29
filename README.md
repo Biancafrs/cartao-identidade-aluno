@@ -109,17 +109,6 @@ erDiagram
 - Todas as relações usam `PROTECT` para preservar registros dependentes.
 - Carga horária e ano devem ser positivos; semestre aceita apenas 1 ou 2.
 
-## Verificação
-
-```bash
-python manage.py check
-python manage.py makemigrations --check --dry-run
-python manage.py migrate
-python manage.py test
-```
-
-A entrega foi validada com 28 testes, incluindo CRUD, CPF, filtros, dashboard vazio, indicadores, agrupamento, proteção das relações e idempotência do comando de demonstração.
-
 ## Evidências
 
 ### Dashboard em desktop
@@ -134,4 +123,4 @@ O checklist detalhado está em [docs/entregas/semana-1/README.md](docs/entregas/
 
 ## Uso de IA
 
-Ferramentas de IA foram usadas como apoio ao planejamento, implementação, testes e documentação.
+Ferramentas de IA foram usadas como apoio ao desenvolvimento do Front-End, implementação, testes e documentação.
