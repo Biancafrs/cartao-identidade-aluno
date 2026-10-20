@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ titulo }} · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="formulario-pagina">
+  <a class="voltar" href="{{ voltar_url }}">← Voltar</a>
+  <div class="painel-formulario">
+    <p class="etiqueta">Identidade acadêmica</p>
+    <h1>{{ titulo }}</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.errors %}<p class="aviso-validacao" role="alert">Revise os campos destacados e tente novamente.</p>{% endif %}
+      {% if form.non_field_errors %}<div class="erros-formulario">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="campo">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% for error in field.errors %}<span class="erro-campo">{{ error }}</span>{% endfor %}
+        </div>
+      {% endfor %}
+      <div class="acoes-formulario">
+        <a class="botao botao-secundario" href="{{ voltar_url }}">Cancelar</a>
+        <button class="botao botao-primario" type="submit">Salvar</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

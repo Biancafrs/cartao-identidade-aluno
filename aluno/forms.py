@@ -1,7 +1,9 @@
 from django import forms
 from django.db.models import Q
 
-from .models import Aluno, Curso, somente_numeros
+from .models import (
+    Aluno, CarteiraAcademica, Curso, InscricaoTurma, Turma, somente_numeros,
+)
 
 
 class AlunoForm(forms.ModelForm):
@@ -65,3 +67,47 @@ class AlunoForm(forms.ModelForm):
 
     def clean_cpf(self):
         return somente_numeros(self.cleaned_data['cpf'])
+
+
+class CursoForm(forms.ModelForm):
+    class Meta:
+        model = Curso
+        fields = ('nome', 'ativo')
+        labels = {'ativo': 'Curso ativo'}
+
+
+class CarteiraAcademicaForm(forms.ModelForm):
+    class Meta:
+        model = CarteiraAcademica
+        fields = ('numero', 'emitida_em', 'valida_ate')
+        labels = {
+            'numero': 'Número da carteira',
+            'emitida_em': 'Data de emissão',
+            'valida_ate': 'Válida até',
+        }
+        widgets = {
+            'emitida_em': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+            'valida_ate': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+        }
+
+
+class InscricaoTurmaForm(forms.ModelForm):
+    def __init__(self, *args, aluno, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['turma'].queryset = (
+            Turma.objects.select_related('disciplina__curso')
+            .exclude(inscricoes__aluno=aluno)
+            .order_by('-ano', 'semestre', 'codigo')
+        )
+        if not self.fields['turma'].queryset.exists():
+            self.fields['turma'].help_text = (
+                'Nenhuma turma disponível. Cadastre uma turma na área administrativa.'
+            )
+
+    class Meta:
+        model = InscricaoTurma
+        fields = ('turma', 'inscrito_em', 'situacao')
+        labels = {'inscrito_em': 'Data da inscrição', 'situacao': 'Situação'}
+        widgets = {
+            'inscrito_em': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
+        }

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .forms import AlunoForm
-from .models import Aluno, Curso, Disciplina, Turma
+from .models import Aluno, CarteiraAcademica, Curso, Disciplina, InscricaoTurma, Turma
 
 
 @admin.register(Aluno)
@@ -32,3 +32,18 @@ class TurmaAdmin(admin.ModelAdmin):
     list_display = ('codigo', 'disciplina', 'ano', 'semestre')
     list_filter = ('ano', 'semestre', 'disciplina__curso')
     search_fields = ('codigo', 'disciplina__nome', 'disciplina__codigo')
+
+
+@admin.register(CarteiraAcademica)
+class CarteiraAcademicaAdmin(admin.ModelAdmin):
+    list_display = ('numero', 'aluno', 'emitida_em', 'valida_ate')
+    search_fields = ('numero', 'aluno__nome')
+    list_select_related = ('aluno',)
+
+
+@admin.register(InscricaoTurma)
+class InscricaoTurmaAdmin(admin.ModelAdmin):
+    list_display = ('aluno', 'turma', 'inscrito_em', 'situacao')
+    list_filter = ('situacao', 'turma__disciplina__curso')
+    search_fields = ('aluno__nome', 'turma__codigo')
+    list_select_related = ('aluno', 'turma')

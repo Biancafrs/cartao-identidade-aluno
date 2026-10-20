@@ -1,13 +1,14 @@
 from datetime import date
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
 
-from .forms import AlunoForm
-from .models import Aluno, Curso, Disciplina, Turma
+from .forms import AlunoForm, CarteiraAcademicaForm, CursoForm, InscricaoTurmaForm
+from .models import Aluno, CarteiraAcademica, Curso, Disciplina, InscricaoTurma, Turma
 
 
 class PaginasAlunoTests(TestCase):
@@ -337,3 +338,153 @@ class PopularDemoTests(TestCase):
         self.assertEqual(resposta.context['total_cursos'], 2)
         self.assertEqual(resposta.context['total_disciplinas'], 2)
         self.assertEqual(resposta.context['total_turmas'], 2)
+
+
+class Semana3Tests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.curso = Curso.objects.create(nome='Ciência da Computação')
+        cls.disciplina = Disciplina.objects.create(
+            nome='Banco de Dados', codigo='CC-101', carga_horaria=60,
+            curso=cls.curso,
+        )
+        cls.turma = Turma.objects.create(
+            codigo='CC-101-A', ano=2026, semestre=2, disciplina=cls.disciplina,
+        )
+        cls.outra_turma = Turma.objects.create(
+            codigo='CC-101-B', ano=2026, semestre=2, disciplina=cls.disciplina,
+        )
+        cls.aluno = Aluno.objects.create(
+            nome='Ana Costa', curso=cls.curso, periodo=2, bio='Estudante.',
+            email_institucional='ana.costa@fepi.edu.br', cpf='12345678901',
+            endereco='Rua Central, 1', data_nascimento=date(2002, 4, 3),
+        )
+        cls.outro_aluno = Aluno.objects.create(
+            nome='Bruno Costa', curso=cls.curso, periodo=2, bio='Estudante.',
+            email_institucional='bruno.costa@fepi.edu.br', cpf='12345678902',
+            endereco='Rua Central, 2', data_nascimento=date(2002, 5, 4),
+        )
+
+    def test_curso_crud_completo(self):
+        self.assertTrue(issubclass(CursoForm, forms.ModelForm))
+        resposta = self.client.post(reverse('cursos:criar'), {
+            'nome': 'Matemática', 'ativo': 'on',
+        }, follow=True)
+        self.assertContains(resposta, 'Curso Matemática cadastrado com sucesso.')
+        curso = Curso.objects.get(nome='Matemática')
+        self.assertContains(self.client.get(reverse('cursos:lista')), 'Matemática')
+        resposta = self.client.get(reverse('cursos:editar', args=[curso.pk]))
+        self.assertContains(resposta, 'value="Matemática"')
+        self.client.post(reverse('cursos:editar', args=[curso.pk]), {
+            'nome': 'Matemática Aplicada', 'ativo': 'on',
+        })
+        curso.refresh_from_db()
+        self.assertEqual(curso.nome, 'Matemática Aplicada')
+        self.assertEqual(Curso.objects.filter(pk=curso.pk).count(), 1)
+        self.client.get(reverse('cursos:excluir', args=[curso.pk]))
+        self.assertTrue(Curso.objects.filter(pk=curso.pk).exists())
+        resposta = self.client.post(reverse('cursos:excluir', args=[curso.pk]), follow=True)
+        self.assertContains(resposta, 'Curso Matemática Aplicada excluído com sucesso.')
+        self.assertFalse(Curso.objects.filter(pk=curso.pk).exists())
+
+    def test_curso_com_dependencias_nao_e_excluido(self):
+        resposta = self.client.get(reverse('cursos:excluir', args=[self.curso.pk]))
+        self.assertContains(resposta, 'Remova esses vínculos antes de excluir')
+        resposta = self.client.post(
+            reverse('cursos:excluir', args=[self.curso.pk]), follow=True,
+        )
+        self.assertContains(resposta, 'Não é possível excluir um curso')
+        self.assertTrue(Curso.objects.filter(pk=self.curso.pk).exists())
+
+    def test_carteira_um_para_um_e_tela_com_dados_reais(self):
+        self.assertTrue(issubclass(CarteiraAcademicaForm, forms.ModelForm))
+        self.assertIsNone(CarteiraAcademica.objects.filter(aluno=self.aluno).first())
+        resposta = self.client.get(reverse('alunos:detalhe', args=[self.aluno.pk]))
+        self.assertContains(resposta, 'ainda não possui carteira')
+        self.assertContains(resposta, 'Cadastrar carteira')
+        dados = {
+            'numero': 'FEPI-2026-001', 'emitida_em': '2026-02-01',
+            'valida_ate': '2027-02-01',
+        }
+        resposta = self.client.post(
+            reverse('alunos:editar_carteira', args=[self.aluno.pk]),
+            dados, follow=True,
+        )
+        self.assertContains(resposta, 'FEPI-2026-001')
+        self.assertContains(resposta, '01/02/2027')
+        self.assertContains(resposta, 'Editar carteira')
+        carteira = self.aluno.carteira
+        self.assertEqual(carteira.numero, 'FEPI-2026-001')
+        dados['numero'] = 'FEPI-2026-002'
+        self.client.post(reverse('alunos:editar_carteira', args=[self.aluno.pk]), dados)
+        carteira.refresh_from_db()
+        self.assertEqual(carteira.numero, 'FEPI-2026-002')
+        self.assertEqual(CarteiraAcademica.objects.filter(aluno=self.aluno).count(), 1)
+        segunda = CarteiraAcademica(
+            aluno=self.aluno, numero='OUTRA',
+            emitida_em=date(2026, 2, 1), valida_ate=date(2027, 2, 1),
+        )
+        with self.assertRaises(ValidationError):
+            segunda.full_clean()
+
+    def test_rota_antiga_da_carteira_aponta_para_o_detalhe(self):
+        resposta = self.client.get(reverse('alunos:carteira_aluno', args=[self.aluno.pk]))
+        self.assertRedirects(
+            resposta,
+            f"{reverse('alunos:detalhe', args=[self.aluno.pk])}#carteira",
+        )
+
+    def test_carteira_rejeita_validade_anterior_a_emissao(self):
+        resposta = self.client.post(reverse('alunos:editar_carteira', args=[self.aluno.pk]), {
+            'numero': 'INVALIDA', 'emitida_em': '2026-02-01',
+            'valida_ate': '2026-01-01',
+        })
+        self.assertContains(resposta, 'A validade deve ser igual ou posterior à emissão.')
+        self.assertFalse(CarteiraAcademica.objects.filter(aluno=self.aluno).exists())
+
+    def test_inscricao_through_guarda_dados_extras_e_aparece_no_detalhe(self):
+        self.assertTrue(issubclass(InscricaoTurmaForm, forms.ModelForm))
+        self.assertEqual(Aluno._meta.get_field('turmas').remote_field.through, InscricaoTurma)
+        resposta = self.client.post(
+            reverse('alunos:inscrever_turma', args=[self.aluno.pk]),
+            {'turma': self.turma.pk, 'inscrito_em': '2026-10-20', 'situacao': 'ATIVA'},
+            follow=True,
+        )
+        self.assertContains(resposta, self.turma.codigo)
+        self.assertContains(resposta, '20/10/2026')
+        inscricao = InscricaoTurma.objects.get(aluno=self.aluno, turma=self.turma)
+        self.assertEqual(inscricao.situacao, InscricaoTurma.Situacao.ATIVA)
+        self.assertEqual(inscricao.inscrito_em, date(2026, 10, 20))
+        self.assertIn(self.turma, self.aluno.turmas.all())
+
+        InscricaoTurma.objects.create(aluno=self.aluno, turma=self.outra_turma)
+        InscricaoTurma.objects.create(aluno=self.outro_aluno, turma=self.turma)
+        self.assertEqual(self.aluno.turmas.count(), 2)
+        self.assertEqual(self.turma.alunos.count(), 2)
+
+        duplicada = self.client.post(reverse('alunos:inscrever_turma', args=[self.aluno.pk]), {
+            'turma': self.turma.pk, 'inscrito_em': '2026-10-20', 'situacao': 'ATIVA',
+        })
+        self.assertEqual(duplicada.status_code, 200)
+        self.assertEqual(InscricaoTurma.objects.filter(
+            aluno=self.aluno, turma=self.turma,
+        ).count(), 1)
+
+    def test_dashboard_e_primeiro_crud_continuam_funcionando(self):
+        self.assertContains(self.client.get(reverse('home')), 'Dashboard acadêmico')
+        self.assertContains(self.client.get(reverse('alunos:lista')), self.aluno.nome)
+        self.assertContains(self.client.get(reverse('alunos:detalhe', args=[self.aluno.pk])), 'Inscrições em turmas')
+
+    def test_exclusao_de_aluno_remove_carteira_e_inscricao(self):
+        CarteiraAcademica.objects.create(
+            aluno=self.aluno, numero='FEPI-TESTE',
+            emitida_em=date(2026, 2, 1), valida_ate=date(2027, 2, 1),
+        )
+        InscricaoTurma.objects.create(aluno=self.aluno, turma=self.turma)
+        resposta = self.client.post(reverse('alunos:excluir_aluno', args=[self.aluno.pk]))
+        self.assertRedirects(resposta, reverse('alunos:lista'))
+        self.assertFalse(Aluno.objects.filter(pk=self.aluno.pk).exists())
+        self.assertFalse(CarteiraAcademica.objects.filter(aluno_id=self.aluno.pk).exists())
+        self.assertFalse(InscricaoTurma.objects.filter(aluno_id=self.aluno.pk).exists())
+        self.assertTrue(Curso.objects.filter(pk=self.curso.pk).exists())
+        self.assertTrue(Turma.objects.filter(pk=self.turma.pk).exists())

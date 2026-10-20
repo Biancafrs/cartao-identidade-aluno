@@ -7,4 +7,5 @@ urlpatterns = [
     path('', aluno_views.dashboard, name='home'),
     path('admin/', admin.site.urls),
     path('aluno/', include('aluno.urls')),
+    path('cursos/', include('aluno.curso_urls')),
 ]

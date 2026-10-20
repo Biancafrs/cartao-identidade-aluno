@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, RegexValidator
+from django.utils import timezone
 
 
 def validar_email_institucional(email):
@@ -108,6 +109,12 @@ class Aluno(models.Model):
     )
     endereco = models.CharField(max_length=200)
     data_nascimento = models.DateField()
+    turmas = models.ManyToManyField(
+        Turma,
+        through='InscricaoTurma',
+        related_name='alunos',
+        blank=True,
+    )
 
     @property
     def cpf_formatado(self):
@@ -131,3 +138,67 @@ class Aluno(models.Model):
         ordering = ['nome']
         verbose_name = 'Aluno'
         verbose_name_plural = 'Alunos'
+
+
+class CarteiraAcademica(models.Model):
+    aluno = models.OneToOneField(
+        Aluno,
+        on_delete=models.CASCADE,
+        related_name='carteira',
+    )
+    numero = models.CharField(max_length=30, unique=True)
+    emitida_em = models.DateField()
+    valida_ate = models.DateField()
+
+    def clean(self):
+        super().clean()
+        if self.emitida_em and self.valida_ate and self.valida_ate < self.emitida_em:
+            raise ValidationError({
+                'valida_ate': 'A validade deve ser igual ou posterior à emissão.'
+            })
+
+    def __str__(self):
+        return f'Carteira {self.numero} — {self.aluno.nome}'
+
+    class Meta:
+        ordering = ('aluno__nome',)
+        verbose_name = 'Carteira acadêmica'
+        verbose_name_plural = 'Carteiras acadêmicas'
+
+
+class InscricaoTurma(models.Model):
+    class Situacao(models.TextChoices):
+        ATIVA = 'ATIVA', 'Ativa'
+        CONCLUIDA = 'CONCLUIDA', 'Concluída'
+        CANCELADA = 'CANCELADA', 'Cancelada'
+
+    aluno = models.ForeignKey(
+        Aluno,
+        on_delete=models.CASCADE,
+        related_name='inscricoes',
+    )
+    turma = models.ForeignKey(
+        Turma,
+        on_delete=models.PROTECT,
+        related_name='inscricoes',
+    )
+    inscrito_em = models.DateField(default=timezone.localdate)
+    situacao = models.CharField(
+        max_length=10,
+        choices=Situacao.choices,
+        default=Situacao.ATIVA,
+    )
+
+    def __str__(self):
+        return f'{self.aluno.nome} — {self.turma.codigo}'
+
+    class Meta:
+        ordering = ('-inscrito_em', 'turma__codigo')
+        verbose_name = 'Inscrição em turma'
+        verbose_name_plural = 'Inscrições em turmas'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('aluno', 'turma'),
+                name='inscricao_aluno_turma_unica',
+            ),
+        ]

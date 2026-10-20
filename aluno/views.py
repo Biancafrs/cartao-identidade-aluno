@@ -1,9 +1,13 @@
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
-from .forms import AlunoForm
-from .models import Aluno, Curso, Disciplina, Turma, somente_numeros
+from .forms import AlunoForm, CarteiraAcademicaForm, InscricaoTurmaForm
+from .models import (
+    Aluno, CarteiraAcademica, Curso, Disciplina, InscricaoTurma, Turma,
+    somente_numeros,
+)
 
 
 def dashboard(request):
@@ -47,7 +51,55 @@ def lista(request):
 
 def detalhe(request, pk):
     aluno = get_object_or_404(Aluno.objects.select_related('curso'), pk=pk)
-    return render(request, 'detalhe.html', {'aluno': aluno})
+    carteira = CarteiraAcademica.objects.filter(aluno=aluno).first()
+    inscricoes = InscricaoTurma.objects.filter(aluno=aluno).select_related(
+        'turma__disciplina__curso'
+    )
+    return render(request, 'detalhe.html', {
+        'aluno': aluno,
+        'carteira': carteira,
+        'inscricoes': inscricoes,
+    })
+
+
+def carteira_aluno(request, pk):
+    get_object_or_404(Aluno, pk=pk)
+    return redirect(f"{reverse('alunos:detalhe', args=[pk])}#carteira")
+
+
+def editar_carteira(request, pk):
+    aluno = get_object_or_404(Aluno, pk=pk)
+    carteira = CarteiraAcademica.objects.filter(aluno=aluno).first()
+    form = CarteiraAcademicaForm(request.POST or None, instance=carteira)
+    if request.method == 'POST' and form.is_valid():
+        carteira = form.save(commit=False)
+        carteira.aluno = aluno
+        carteira.save()
+        messages.success(request, 'Carteira acadêmica salva com sucesso.')
+        return redirect(f"{reverse('alunos:detalhe', args=[aluno.pk])}#carteira")
+
+    return render(request, 'form_relacionamento.html', {
+        'form': form,
+        'titulo': f'Carteira acadêmica de {aluno.nome}',
+        'voltar_url': f"{reverse('alunos:detalhe', args=[aluno.pk])}#carteira",
+    })
+
+
+def inscrever_turma(request, pk):
+    aluno = get_object_or_404(Aluno, pk=pk)
+    form = InscricaoTurmaForm(request.POST or None, aluno=aluno)
+    if request.method == 'POST' and form.is_valid():
+        inscricao = form.save(commit=False)
+        inscricao.aluno = aluno
+        inscricao.save()
+        messages.success(request, 'Inscrição em turma registrada com sucesso.')
+        return redirect('alunos:detalhe', pk=aluno.pk)
+
+    return render(request, 'form_relacionamento.html', {
+        'form': form,
+        'titulo': f'Inscrever {aluno.nome} em uma turma',
+        'voltar_url': reverse('alunos:detalhe', args=[aluno.pk]),
+    })
 
 
 def criar_aluno(request):

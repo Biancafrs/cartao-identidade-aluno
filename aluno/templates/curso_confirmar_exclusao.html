@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Excluir {{ curso.nome }} · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="formulario-pagina">
+  <a class="voltar" href="{% url 'cursos:lista' %}">← Voltar para os cursos</a>
+  <div class="painel-formulario">
+    <p class="etiqueta">Confirmação</p>
+    <h1>Excluir curso</h1>
+    <p>Tem certeza de que deseja excluir <strong>{{ curso.nome }}</strong>?</p>
+    {% if total_alunos or total_disciplinas %}
+      <p class="aviso-validacao" role="alert">Este curso tem {{ total_alunos }} aluno{{ total_alunos|pluralize }} e {{ total_disciplinas }} disciplina{{ total_disciplinas|pluralize }} vinculados. Remova esses vínculos antes de excluir o curso.</p>
+      <a class="botao botao-secundario" href="{% url 'cursos:lista' %}">Voltar</a>
+    {% else %}
+      <p class="aviso">Esta ação não poderá ser desfeita.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="acoes-formulario">
+          <a class="botao botao-secundario" href="{% url 'cursos:lista' %}">Cancelar</a>
+          <button class="botao botao-perigo" type="submit">Sim, excluir</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

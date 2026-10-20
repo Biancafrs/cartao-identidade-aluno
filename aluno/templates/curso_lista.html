@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Cursos · Identidade Acadêmica{% endblock %}
+{% block content %}
+<section class="dashboard-pagina">
+  <div class="dashboard-cabecalho">
+    <div>
+      <p class="etiqueta">Cadastro acadêmico · FEPI</p>
+      <h1>Cursos</h1>
+      <p>Consulte e organize os cursos cadastrados.</p>
+    </div>
+    <a class="botao botao-primario" href="{% url 'cursos:criar' %}">Novo curso</a>
+  </div>
+  <section class="painel-distribuicao" aria-labelledby="titulo-lista-cursos">
+    <div class="painel-titulo">
+      <div><span>Diretório acadêmico</span><h2 id="titulo-lista-cursos">Cursos cadastrados</h2></div>
+    </div>
+    {% if cursos %}
+      <div class="tabela-responsiva">
+        <table class="tabela-dashboard tabela-cursos">
+          <thead><tr><th scope="col">Curso</th><th scope="col">Situação</th><th scope="col">Alunos</th><th scope="col">Disciplinas</th><th scope="col">Ações</th></tr></thead>
+          <tbody>
+            {% for curso in cursos %}
+              <tr>
+                <td><strong>{{ curso.nome }}</strong></td>
+                <td>{% if curso.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+                <td>{{ curso.total_alunos }}</td>
+                <td>{{ curso.total_disciplinas }}</td>
+                <td class="acoes-tabela">
+                  <a href="{% url 'cursos:editar' curso.pk %}">Editar</a>
+                  <a class="link-perigo" href="{% url 'cursos:excluir' curso.pk %}">Excluir</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="dashboard-vazio"><h3>Nenhum curso cadastrado</h3><p>Use “Novo curso” para começar.</p></div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

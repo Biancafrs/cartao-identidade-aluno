@@ -35,7 +35,7 @@
         </table>
       </div>
     {% else %}
-      <div class="dashboard-vazio"><h3>Nenhum curso cadastrado</h3><p>Cadastre cursos na área administrativa para iniciar a distribuição.</p></div>
+      <div class="dashboard-vazio"><h3>Nenhum curso cadastrado</h3><p><a href="{% url 'cursos:criar' %}">Cadastre um curso</a> para iniciar a distribuição.</p></div>
     {% endif %}
   </section>
 </section>

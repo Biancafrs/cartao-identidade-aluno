@@ -24,7 +24,48 @@
       <div class="divisor"></div>
       <span class="bio-titulo">Sobre</span>
       <p class="bio-completa">{{ aluno.bio }}</p>
+      <div class="divisor"></div>
+      <section id="carteira" class="carteira-integrada" aria-labelledby="titulo-carteira">
+        <div class="painel-titulo">
+          <div><span>Documento acadêmico</span><h2 id="titulo-carteira">Carteira acadêmica</h2></div>
+          <a href="{% url 'alunos:editar_carteira' aluno.pk %}">{% if carteira %}Editar carteira{% else %}Cadastrar carteira{% endif %} →</a>
+        </div>
+        {% if carteira %}
+          <dl class="dados-aluno dados-carteira">
+            <div><dt>Número</dt><dd>{{ carteira.numero }}</dd></div>
+            <div><dt>Emitida em</dt><dd>{{ carteira.emitida_em|date:'d/m/Y' }}</dd></div>
+            <div><dt>Válida até</dt><dd>{{ carteira.valida_ate|date:'d/m/Y' }}</dd></div>
+          </dl>
+        {% else %}
+          <p>Este aluno ainda não possui carteira acadêmica cadastrada.</p>
+        {% endif %}
+      </section>
     </div>
   </article>
+  <section class="painel-relacao" aria-labelledby="titulo-inscricoes">
+    <div class="painel-titulo">
+      <div><span>Vínculos acadêmicos</span><h2 id="titulo-inscricoes">Inscrições em turmas</h2></div>
+      <a href="{% url 'alunos:inscrever_turma' aluno.pk %}">Nova inscrição →</a>
+    </div>
+    {% if inscricoes %}
+      <div class="tabela-responsiva">
+        <table class="tabela-dashboard">
+          <thead><tr><th scope="col">Turma</th><th scope="col">Disciplina</th><th scope="col">Inscrição</th><th scope="col">Situação</th></tr></thead>
+          <tbody>
+            {% for inscricao in inscricoes %}
+              <tr>
+                <td>{{ inscricao.turma.codigo }}</td>
+                <td>{{ inscricao.turma.disciplina.nome }}</td>
+                <td>{{ inscricao.inscrito_em|date:'d/m/Y' }}</td>
+                <td>{{ inscricao.get_situacao_display }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>Nenhuma inscrição em turma cadastrada.</p>
+    {% endif %}
+  </section>
 </section>
 {% endblock %}

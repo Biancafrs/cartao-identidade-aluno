@@ -21,14 +21,20 @@ O CRUD de alunos foi revisado e validado, edição e exclusão agora mostram con
 
 Veja o [checklist e os prints da semana 2](docs/entregas/semana-2/README.md). A tag prevista para esta entrega é `semana-2`.
 
+## Entrega da semana 3
+
+A carteira acadêmica de cada aluno usa `OneToOneField`. Alunos podem se inscrever em várias turmas, e cada turma pode receber vários alunos; o vínculo usa `ManyToManyField` com `through=InscricaoTurma` e guarda data e situação da inscrição. Cursos agora têm listagem, cadastro, edição e exclusão fora do Admin.
+
+Veja o [checklist e os prints da semana 3](docs/entregas/semana-3/README.md). A tag prevista é `semana-3`.
+
 ## Tecnologias
 
 - Python 3.12 ou mais recente compatível com Django 6.1;
 - Django 6.1;
 - SQLite;
-- HTML e CSS.
+- HTML, CSS e JavaScript.
 
-O desenvolvimento foi validado localmente com Python 3.14.7 e Django 6.1.
+O desenvolvimento foi validado localmente com Python 3.14.8 e Django 6.1.
 
 ## Instalação
 
@@ -95,10 +101,17 @@ O comando usa identificadores estáveis e pode ser executado novamente sem dupli
 | `/` | Dashboard com indicadores e alunos por curso |
 | `/aluno/` | Listagem, busca e filtro de alunos |
 | `/aluno/novo/` | Cadastro de aluno |
-| `/aluno/<id>/` | Detalhes do aluno |
+| `/aluno/<id>/` | Detalhes do aluno, carteira acadêmica e inscrições em turmas |
 | `/aluno/<id>/editar/` | Edição do aluno |
 | `/aluno/<id>/excluir/` | Confirmação de exclusão |
-| `/admin/` | Administração de alunos, cursos, disciplinas e turmas |
+| `/aluno/<id>/carteira/` | Redireciona para a carteira nos detalhes do aluno |
+| `/aluno/<id>/carteira/editar/` | Cadastro e edição da carteira; retorna aos detalhes |
+| `/aluno/<id>/inscricoes/nova/` | Inscrição do aluno em uma turma |
+| `/cursos/` | Listagem de cursos |
+| `/cursos/novo/` | Cadastro de curso |
+| `/cursos/<id>/editar/` | Edição de curso |
+| `/cursos/<id>/excluir/` | Confirmação de exclusão de curso |
+| `/admin/` | Administração dos seis models |
 
 ## Modelo de dados
 
@@ -107,12 +120,18 @@ erDiagram
     CURSO ||--o{ ALUNO : possui
     CURSO ||--o{ DISCIPLINA : oferece
     DISCIPLINA ||--o{ TURMA : possui
+    ALUNO ||--o| CARTEIRA_ACADEMICA : possui
+    ALUNO ||--o{ INSCRICAO_TURMA : realiza
+    TURMA ||--o{ INSCRICAO_TURMA : recebe
 ```
 
 - `Aluno.curso` usa `ForeignKey` com `related_name="alunos"`.
 - `Disciplina.curso` usa `ForeignKey` com `related_name="disciplinas"`.
 - `Turma.disciplina` usa `ForeignKey` com `related_name="turmas"`.
-- Todas as relações usam `PROTECT` para preservar registros dependentes.
+- `CarteiraAcademica.aluno` usa `OneToOneField`; cada carteira pertence a um único aluno.
+- `Aluno.turmas` usa `ManyToManyField` com `through="InscricaoTurma"`.
+- `InscricaoTurma.aluno` e `InscricaoTurma.turma` são `ForeignKey`; o par aluno/turma é único e a associação guarda data e situação.
+- Os vínculos de curso, disciplina e turma usam `PROTECT` para preservar registros dependentes; carteira e inscrição são removidas quando o aluno é excluído.
 - Carga horária e ano devem ser positivos; semestre aceita apenas 1 ou 2.
 
 ## Evidências
