@@ -15,6 +15,12 @@ A entrega inclui:
 - CRUD de alunos, busca por nome ou CPF e filtro por curso;
 - dados demonstrativos reproduzíveis e testes automatizados.
 
+## Entrega da semana 2
+
+O CRUD de alunos foi revisado e validado, edição e exclusão agora mostram confirmação após salvar no banco; formulários inválidos orientam a correção dos campos. As telas e o dashboard da semana 1 foram preservados.
+
+Veja o [checklist e os prints da semana 2](docs/entregas/semana-2/README.md). A tag prevista para esta entrega é `semana-2`.
+
 ## Tecnologias
 
 - Python 3.12 ou mais recente compatível com Django 6.1;

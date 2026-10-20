@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -52,7 +53,8 @@ def detalhe(request, pk):
 def criar_aluno(request):
     form = AlunoForm(request.POST or None)
     if request.method == 'POST' and form.is_valid():
-        form.save()
+        aluno = form.save()
+        messages.success(request, f'Aluno {aluno.nome} cadastrado com sucesso.')
         return redirect('alunos:lista')
 
     return render(request, 'form_aluno.html', {'form': form, 'titulo': 'Novo aluno'})
@@ -63,6 +65,7 @@ def editar_aluno(request, pk):
     form = AlunoForm(request.POST or None, instance=aluno)
     if request.method == 'POST' and form.is_valid():
         form.save()
+        messages.success(request, f'Aluno {aluno.nome} atualizado com sucesso.')
         return redirect('alunos:lista')
 
     return render(
@@ -76,7 +79,9 @@ def excluir_aluno(request, pk):
     aluno = get_object_or_404(Aluno.objects.select_related('curso'), pk=pk)
 
     if request.method == 'POST':
+        nome = aluno.nome
         aluno.delete()
+        messages.success(request, f'Aluno {nome} excluído com sucesso.')
         return redirect('alunos:lista')
 
     return render(request, 'confirmar_exclusao.html', {'aluno': aluno})

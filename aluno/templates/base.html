@@ -25,8 +25,29 @@
         <a class="admin-link" href="{% url 'admin:index' %}">Área administrativa <span>↗</span></a>
       </nav>
     </header>
-    <main>{% block content %}{% endblock %}</main>
+    <main>
+      {% if messages %}
+        <div class="mensagens" aria-live="polite">
+          {% for message in messages %}
+            <p class="mensagem{% if message.tags %} mensagem-{{ message.tags }}{% endif %}" role="status">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
     <footer>Projeto desenvolvido com Django por Bianca Ferreira.</footer>
+    <script>
+      document.querySelectorAll('.mensagem-success').forEach((mensagem) => {
+        window.setTimeout(() => {
+          mensagem.classList.add('mensagem-saindo');
+          window.setTimeout(() => {
+            const lista = mensagem.parentElement;
+            mensagem.remove();
+            if (lista && !lista.children.length) lista.remove();
+          }, 300);
+        }, 5000);
+      });
+    </script>
     {% block scripts %}{% endblock %}
   </body>
 </html>

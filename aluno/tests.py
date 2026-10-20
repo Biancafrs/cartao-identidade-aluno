@@ -69,6 +69,13 @@ class PaginasAlunoTests(TestCase):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos())
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.assertTrue(Aluno.objects.filter(nome='Carlos Lima').exists())
+        self.assertContains(self.client.get(reverse('alunos:lista')), 'Carlos Lima')
+
+    def test_cadastro_exibe_mensagem_de_sucesso(self):
+        resposta = self.client.post(
+            reverse('alunos:criar_aluno'), self.dados_validos(), follow=True,
+        )
+        self.assertContains(resposta, 'Aluno Carlos Lima cadastrado com sucesso.')
 
     def test_formulario_rejeita_curso_inexistente(self):
         form = AlunoForm(data=self.dados_validos(curso=999999))
@@ -112,6 +119,8 @@ class PaginasAlunoTests(TestCase):
         resposta = self.client.post(reverse('alunos:criar_aluno'), self.dados_validos(cpf=''))
         self.assertEqual(resposta.status_code, 200)
         self.assertFormError(resposta.context['form'], 'cpf', 'Este campo é obrigatório.')
+        self.assertContains(resposta, 'Revise os campos destacados e tente novamente.')
+        self.assertFalse(Aluno.objects.filter(nome='Carlos Lima').exists())
 
     def test_busca_por_nome(self):
         resposta = self.client.get(reverse('alunos:lista'), {'busca': 'Ana'})
@@ -146,13 +155,27 @@ class PaginasAlunoTests(TestCase):
         self.assertContains(resposta, 'Ativo')
 
     def test_editar_aluno(self):
+        total_antes = Aluno.objects.count()
         resposta = self.client.post(
             reverse('alunos:editar_aluno', args=[self.aluno.pk]),
             self.dados_validos(nome='Ana Souza', email_institucional='ana@fepi.edu.br'),
+            follow=True,
         )
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.aluno.refresh_from_db()
         self.assertEqual(self.aluno.nome, 'Ana Souza')
+        self.assertEqual(Aluno.objects.count(), total_antes)
+        self.assertContains(resposta, 'Aluno Ana Souza atualizado com sucesso.')
+
+    def test_edicao_invalida_preserva_dados(self):
+        resposta = self.client.post(
+            reverse('alunos:editar_aluno', args=[self.aluno.pk]),
+            self.dados_validos(nome='Nome inválido', cpf='123'),
+        )
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'Revise os campos destacados e tente novamente.')
+        self.aluno.refresh_from_db()
+        self.assertEqual(self.aluno.nome, 'Ana Silva')
 
     def test_edicao_exibe_data_de_nascimento_no_campo(self):
         resposta = self.client.get(reverse('alunos:editar_aluno', args=[self.aluno.pk]))
@@ -160,9 +183,18 @@ class PaginasAlunoTests(TestCase):
         self.assertContains(resposta, 'value="2000-05-20"')
 
     def test_excluir_aluno(self):
-        resposta = self.client.post(reverse('alunos:excluir_aluno', args=[self.aluno.pk]))
+        resposta = self.client.post(
+            reverse('alunos:excluir_aluno', args=[self.aluno.pk]), follow=True,
+        )
         self.assertRedirects(resposta, reverse('alunos:lista'))
         self.assertFalse(Aluno.objects.filter(pk=self.aluno.pk).exists())
+        self.assertContains(resposta, 'Aluno Ana Silva excluído com sucesso.')
+        self.assertNotContains(resposta, 'Ana Silva</h3>')
+
+    def test_exclusao_exige_confirmacao(self):
+        resposta = self.client.get(reverse('alunos:excluir_aluno', args=[self.aluno.pk]))
+        self.assertContains(resposta, 'Tem certeza de que deseja excluir')
+        self.assertTrue(Aluno.objects.filter(pk=self.aluno.pk).exists())
 
     def test_curso_com_aluno_nao_pode_ser_excluido(self):
         with self.assertRaises(ProtectedError):

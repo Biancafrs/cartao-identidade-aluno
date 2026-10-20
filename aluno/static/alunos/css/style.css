@@ -624,6 +624,36 @@ a {
     font-size: .88rem;
 }
 
+.mensagens {
+    max-width: 1180px;
+    margin: 16px auto 0;
+    padding: 0 24px;
+}
+
+.mensagem,
+.aviso-validacao {
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.mensagem-success {
+    color: #17523b;
+    background: #e7f5ed;
+    border: 1px solid #a9ddc0;
+    transition: opacity .3s ease;
+}
+
+.mensagem-saindo {
+    opacity: 0;
+}
+
+.aviso-validacao {
+    color: #852020;
+    background: #fff0f0;
+    border: 1px solid #edb8b8;
+}
+
 .acoes-formulario {
     display: grid;
     width: 100%;
